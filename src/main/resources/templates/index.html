@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Precisei - Encontre profissionais</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+
+<body>
+
+    <header class="cabecalho-site">
+        <nav aria-label="Navegação principal">
+            <a class="marca" th:href="@{/}" href="/" aria-label="Precisei - Página inicial">
+                <span class="marca-icone" aria-hidden="true">P</span>
+                <h1>Precisei</h1>
+            </a>
+
+            <ul>
+                <li><a th:href="@{/}" href="/" aria-current="page">Início</a></li>
+                <li><a th:href="@{/profissionais}" href="/profissionais">Profissionais</a></li>
+                <li><a th:href="@{/servicos}" href="/servicos">Serviços</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="pagina-inicial">
+
+        <section class="hero">
+            <div class="hero-conteudo">
+                <p class="hero-etiqueta">Serviços perto de você</p>
+                <h2>Precisou? O Precisei conecta você.</h2>
+                <p class="hero-descricao">
+                    Encontre categorias de pequenos reparos e avance com segurança
+                    até o profissional ideal para o seu atendimento.
+                </p>
+                <a th:href="@{/servicos}" href="/servicos" class="botao botao-claro">
+                    Explorar serviços
+                </a>
+            </div>
+
+            <aside class="hero-painel" aria-label="Critérios para encontrar profissionais">
+                <div class="hero-painel-topo">
+                    <span class="sinal-status" aria-hidden="true"></span>
+                    <span>Busca simples e objetiva</span>
+                </div>
+                <ol class="criterios">
+                    <li>
+                        <span class="criterio-numero">1</span>
+                        <span><strong>Categoria</strong>Escolha o serviço necessário</span>
+                    </li>
+                    <li>
+                        <span class="criterio-numero">2</span>
+                        <span><strong>Localização</strong>Encontre opções próximas</span>
+                    </li>
+                    <li>
+                        <span class="criterio-numero">3</span>
+                        <span><strong>Disponibilidade</strong>Consulte quem pode atender</span>
+                    </li>
+                </ol>
+            </aside>
+        </section>
+
+        <section class="secao-categorias" aria-labelledby="titulo-categorias-home">
+            <div class="secao-cabecalho">
+                <div>
+                    <p class="rotulo">Categorias</p>
+                    <h2 id="titulo-categorias-home">Encontre o serviço que precisa</h2>
+                </div>
+                <a class="link-seta" th:href="@{/servicos}" href="/servicos">Ver todas <span aria-hidden="true">→</span></a>
+            </div>
+
+            <div class="categorias">
+
+                <article th:each="categoria : ${categorias}">
+                    <span th:replace="~{fragments/categoria-icone :: icone(${categoria})}"></span>
+                    <h3 th:text="${categoria.nome}">Nome da categoria</h3>
+                    <p>Encontre profissionais disponíveis nesta categoria.</p>
+                </article>
+
+                <p class="estado-vazio" th:if="${#lists.isEmpty(categorias)}">
+                    Nenhuma categoria foi cadastrada ainda.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="rodape-site">
+
+        <p>
+            © 2026 Precisei - Projeto Integrador de Tecnologia da Informação II
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

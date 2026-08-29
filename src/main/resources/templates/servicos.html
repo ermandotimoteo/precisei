@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços - Precisei</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+
+<body>
+    <header class="cabecalho-site">
+        <nav aria-label="Navegação principal">
+            <a class="marca" th:href="@{/}" href="/" aria-label="Precisei - Página inicial">
+                <span class="marca-icone" aria-hidden="true">P</span>
+                <h1>Precisei</h1>
+            </a>
+            <ul>
+                <li><a th:href="@{/}" href="/">Início</a></li>
+                <li><a th:href="@{/profissionais}" href="/profissionais">Profissionais</a></li>
+                <li><a th:href="@{/servicos}" href="/servicos" aria-current="page">Serviços</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="pagina-servicos">
+        <section class="cabecalho-pagina" aria-labelledby="titulo-servicos">
+            <div>
+                <p class="rotulo">Categorias</p>
+                <h2 id="titulo-servicos">Serviços disponíveis</h2>
+                <p>Consulte e organize as categorias utilizadas para encontrar profissionais no Precisei.</p>
+            </div>
+            <span class="cabecalho-pagina-icone" aria-hidden="true">✓</span>
+        </section>
+
+        <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}"
+            th:text="${mensagemSucesso}"></p>
+
+        <div class="conteudo-servicos">
+            <section aria-labelledby="titulo-categorias">
+                <h2 id="titulo-categorias">Categorias cadastradas</h2>
+
+                <div class="categorias categorias-lista">
+                    <article th:each="categoria : ${categorias}">
+                        <span th:replace="~{fragments/categoria-icone :: icone(${categoria})}"></span>
+                        <h3 th:text="${categoria.nome}">Nome da categoria</h3>
+                        <p>Categoria disponível para classificação dos profissionais.</p>
+                    </article>
+                </div>
+
+                <p class="estado-vazio" th:if="${#lists.isEmpty(categorias)}">
+                    Nenhuma categoria foi cadastrada ainda.
+                </p>
+            </section>
+
+            <section class="painel-formulario" aria-labelledby="titulo-cadastro">
+                <h2 id="titulo-cadastro">Cadastrar categoria</h2>
+                <p>Adicione uma categoria simples para organizar os serviços oferecidos.</p>
+
+                <form th:action="@{/servicos}" th:object="${novaCategoria}" method="post">
+                    <div class="campo">
+                        <label for="nome">Nome da categoria</label>
+                        <input id="nome" type="text" th:field="*{nome}" maxlength="80"
+                            autocomplete="off"
+                            th:attr="aria-invalid=${#fields.hasErrors('nome')},aria-describedby=${#fields.hasErrors('nome') ? 'erro-nome' : null}">
+                        <p id="erro-nome" class="erro" th:if="${#fields.hasErrors('nome')}"
+                            th:errors="*{nome}"></p>
+                    </div>
+
+                    <button class="botao" type="submit">Cadastrar categoria</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <footer class="rodape-site">
+        <p>© 2026 Precisei - Projeto Integrador de Tecnologia da Informação II</p>
+    </footer>
+</body>
+
+</html>

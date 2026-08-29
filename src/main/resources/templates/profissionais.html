@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profissionais - Precisei</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+
+<body>
+    <header class="cabecalho-site">
+        <nav aria-label="Navegação principal">
+            <a class="marca" th:href="@{/}" href="/" aria-label="Precisei - Página inicial">
+                <span class="marca-icone" aria-hidden="true">P</span>
+                <h1>Precisei</h1>
+            </a>
+            <ul>
+                <li><a th:href="@{/}" href="/">Início</a></li>
+                <li><a th:href="@{/profissionais}" href="/profissionais" aria-current="page">Profissionais</a></li>
+                <li><a th:href="@{/servicos}" href="/servicos">Serviços</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="pagina-profissionais">
+        <section class="cabecalho-pagina" aria-labelledby="titulo-profissionais">
+            <div>
+                <p class="rotulo">Profissionais</p>
+                <h2 id="titulo-profissionais">Encontre a área que você precisa</h2>
+                <p>Conheça as categorias disponíveis nesta solução inicial do Precisei.</p>
+            </div>
+            <span class="cabecalho-pagina-icone" aria-hidden="true">⌕</span>
+        </section>
+
+        <section class="painel-etapa" aria-labelledby="titulo-etapa">
+            <div class="painel-etapa-conteudo">
+                <p class="rotulo">Solução inicial</p>
+                <h2 id="titulo-etapa">Áreas de atendimento</h2>
+                <p>
+                    As categorias abaixo são carregadas diretamente do banco de dados.
+                    O cadastro e os perfis individuais dos profissionais fazem parte da próxima etapa do projeto.
+                </p>
+            </div>
+            <a class="botao" th:href="@{/servicos}" href="/servicos">Consultar serviços</a>
+        </section>
+
+        <section class="secao-categorias" aria-labelledby="titulo-areas">
+            <div class="secao-cabecalho">
+                <div>
+                    <p class="rotulo">Categorias cadastradas</p>
+                    <h2 id="titulo-areas">Serviços previstos</h2>
+                </div>
+            </div>
+
+            <div class="categorias">
+                <article th:each="categoria : ${categorias}">
+                    <span th:replace="~{fragments/categoria-icone :: icone(${categoria})}"></span>
+                    <h3 th:text="${categoria.nome}">Nome da categoria</h3>
+                    <p>Área disponível para organização e futura busca de profissionais.</p>
+                </article>
+
+                <p class="estado-vazio" th:if="${#lists.isEmpty(categorias)}">
+                    Nenhuma categoria foi cadastrada ainda.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rodape-site">
+        <p>© 2026 Precisei - Projeto Integrador de Tecnologia da Informação II</p>
+    </footer>
+</body>
+
+</html>

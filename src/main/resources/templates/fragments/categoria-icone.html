@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <span class="categoria-icone" aria-hidden="true"
+        th:fragment="icone(categoria)" th:switch="${categoria.nome}">
+
+        <svg th:case="'Chaveiro'" viewBox="0 0 24 24" focusable="false">
+            <circle cx="6.5" cy="12" r="3.5"></circle>
+            <path d="M10 12h10M16 12v3M19 12v2"></path>
+        </svg>
+
+        <svg class="icone-preenchido" th:case="'Elétrica'" viewBox="0 0 24 24" focusable="false">
+            <path d="M13.2 2 5.5 13.2h6.2L10.8 22l7.7-12.2h-6.2L13.2 2Z"></path>
+        </svg>
+
+        <svg th:case="'Faxina'" viewBox="0 0 24 24" focusable="false">
+            <path d="M15.5 2.5 10 14"></path>
+            <path d="M8.8 13.5h3.8l3.6 7.5H5.2l3.6-7.5Z"></path>
+            <path d="M7.2 17.2h7.2M6.2 19.2h9.2"></path>
+        </svg>
+
+        <svg th:case="'Hidráulica'" viewBox="0 0 24 24" focusable="false">
+            <path d="M12 2.5S5.5 9.4 5.5 14.2a6.5 6.5 0 0 0 13 0C18.5 9.4 12 2.5 12 2.5Z"></path>
+            <path d="M9 15.2a3.2 3.2 0 0 0 3 2.1"></path>
+        </svg>
+
+        <svg th:case="'Montagem de móveis'" viewBox="0 0 24 24" focusable="false">
+            <path d="M2.5 6.5h9.8l3.2 3v4h-5l-2-2h-6Z"></path>
+            <path d="M5.5 11.5v7h4v-7M15.5 10h5"></path>
+            <path d="m18 4 2 2-4.5 4.5M19 5l2-2"></path>
+        </svg>
+
+        <svg th:case="'Pintura'" viewBox="0 0 24 24" focusable="false">
+            <rect x="3" y="4" width="13" height="5" rx="1.5"></rect>
+            <path d="M16 6.5h2.5a2 2 0 0 1 2 2v3.5H12v3"></path>
+            <path d="M12 15v6"></path>
+        </svg>
+
+        <svg th:case="*" viewBox="0 0 24 24" focusable="false">
+            <path d="M14.5 6.5a4 4 0 0 0-5-4l2.3 2.3-3 3-2.3-2.3a4 4 0 0 0 5 5L19 18l-2 2-7.5-7.5a4 4 0 0 0-5 4l2.3-2.3 3 3-2.3 2.3a4 4 0 0 0 5-5"></path>
+        </svg>
+    </span>
+</body>
+
+</html>
