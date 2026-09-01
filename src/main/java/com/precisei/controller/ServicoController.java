@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.precisei.model.Categoria;
 import com.precisei.service.CategoriaService;
+import com.precisei.service.ServicoService;
 
 import jakarta.validation.Valid;
 
@@ -19,9 +20,11 @@ import jakarta.validation.Valid;
 public class ServicoController {
 
     private final CategoriaService categoriaService;
+    private final ServicoService servicoService;
 
-    public ServicoController(CategoriaService categoriaService) {
+    public ServicoController(CategoriaService categoriaService, ServicoService servicoService) {
         this.categoriaService = categoriaService;
+        this.servicoService = servicoService;
     }
 
     @GetMapping
@@ -45,6 +48,7 @@ public class ServicoController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categorias", categoriaService.listarTodas());
+            model.addAttribute("servicos", servicoService.listarTodos());
             return "servicos";
         }
 
@@ -55,6 +59,7 @@ public class ServicoController {
 
     private void prepararPagina(Model model, Categoria novaCategoria) {
         model.addAttribute("categorias", categoriaService.listarTodas());
+        model.addAttribute("servicos", servicoService.listarTodos());
         model.addAttribute("novaCategoria", novaCategoria);
     }
 }

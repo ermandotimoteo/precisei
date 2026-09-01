@@ -40,7 +40,10 @@ O público-alvo conceitual é formado por:
 - mensagens de validação e confirmação no formulário;
 - carga inicial de categorias sem gerar duplicações;
 - ícones SVG específicos para as categorias;
-- página introdutória de profissionais com categorias reais do banco;
+- página de profissionais integrada aos perfis reais do banco;
+- catálogo de serviços carregado do MySQL;
+- listagem de profissionais, localização, disponibilidade e serviços oferecidos;
+- mapeamento JPA de todas as entidades e relacionamentos do DER;
 - testes unitários e de integração.
 
 Categorias iniciais:
@@ -56,9 +59,9 @@ Categorias iniciais:
 
 Esta versão representa uma **solução inicial dinâmica para o Módulo 2**, e não o MVP completo da plataforma.
 
-Ainda não foram implementados:
+Ainda não foram implementados pela interface:
 
-- cadastro e edição de perfis de profissionais;
+- cadastro e edição de perfis de profissionais e serviços;
 - cadastro e autenticação de usuários;
 - pesquisa de profissionais por localização e disponibilidade;
 - solicitação de atendimento;
@@ -99,7 +102,7 @@ A evolução planejada do banco está documentada em:
 - [Dicionário de dados](docs/modelagem/dicionario-de-dados.md);
 - [Regras de integridade e negócio](docs/modelagem/regras-de-integridade.md).
 
-O modelo inclui Categoria, Serviço, Profissional, Cliente, Solicitação de Serviço e Avaliação, além da associação muitos para muitos entre profissionais e serviços. O esquema correspondente está implementado em uma migração Flyway e continuará evoluindo incrementalmente.
+O modelo inclui Categoria, Serviço, Profissional, Cliente, Solicitação de Serviço e Avaliação, além da associação muitos para muitos entre profissionais e serviços. O esquema correspondente está implementado em migrações Flyway e todas as tabelas estão mapeadas em entidades JPA.
 
 ### Esquema SQL versionado
 
@@ -221,7 +224,7 @@ Com o MySQL iniciado e a variável `DB_PASSWORD` configurada, execute:
 .\mvnw.cmd test
 ```
 
-Na última validação da entrega foram executados **14 testes**, sem falhas ou erros.
+Na última validação foram executados **16 testes**, sem falhas ou erros.
 
 ## Responsividade e acessibilidade
 
@@ -239,7 +242,7 @@ Também foram aplicados:
 
 ## Próximas etapas
 
-- implementar as entidades JPA correspondentes ao novo esquema;
+- implementar formulários de cadastro e edição para serviços e profissionais;
 - implementar os perfis reais de profissionais;
 - relacionar profissionais aos serviços oferecidos;
 - permitir filtros por categoria, localização e disponibilidade;

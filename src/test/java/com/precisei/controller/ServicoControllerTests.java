@@ -19,12 +19,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import com.precisei.model.Categoria;
 import com.precisei.service.CategoriaService;
+import com.precisei.service.ServicoService;
 
 @ExtendWith(MockitoExtension.class)
 class ServicoControllerTests {
 
     @Mock
     private CategoriaService categoriaService;
+
+    @Mock
+    private ServicoService servicoService;
 
     @InjectMocks
     private ServicoController servicoController;
@@ -39,6 +43,7 @@ class ServicoControllerTests {
 
         assertEquals("servicos", view);
         assertEquals(categorias, model.get("categorias"));
+        assertEquals(List.of(), model.get("servicos"));
         assertTrue(model.get("novaCategoria") instanceof Categoria);
     }
 

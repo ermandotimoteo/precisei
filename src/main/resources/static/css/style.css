@@ -470,6 +470,117 @@ main {
     align-items: start;
 }
 
+.secao-listagem {
+    margin-bottom: 42px;
+}
+
+.grade-servicos,
+.grade-profissionais {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.cartao-servico,
+.cartao-profissional {
+    padding: 24px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-medio);
+    background-color: var(--superficie);
+    box-shadow: var(--sombra-leve);
+}
+
+.cartao-servico h3,
+.cartao-profissional h3 {
+    margin: 5px 0 8px;
+    color: var(--azul-noite);
+}
+
+.cartao-servico > p:not(.etiqueta-categoria, .preco),
+.descricao-profissional,
+.profissional-topo p {
+    color: var(--texto-suave);
+}
+
+.etiqueta-categoria,
+.disponibilidade {
+    color: var(--azul-principal);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.preco {
+    margin-top: 18px;
+    color: var(--texto-suave);
+}
+
+.preco strong {
+    display: block;
+    color: var(--verde);
+    font-size: 20px;
+}
+
+.profissional-topo {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--azul-vivo), var(--azul-principal));
+    color: white;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.disponibilidade {
+    padding: 6px 9px;
+    border-radius: 999px;
+}
+
+.disponibilidade.disponivel {
+    background-color: #eaf8ee;
+    color: #176535;
+}
+
+.disponibilidade.indisponivel {
+    background-color: #f1f3f6;
+    color: var(--texto-suave);
+}
+
+.descricao-profissional {
+    margin: 20px 0;
+}
+
+.cartao-profissional h4 {
+    margin-bottom: 8px;
+    color: var(--azul-noite);
+}
+
+.lista-servicos-profissional {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    list-style: none;
+}
+
+.lista-servicos-profissional li {
+    padding: 6px 9px;
+    border-radius: 8px;
+    background-color: var(--azul-claro);
+    color: var(--azul-escuro);
+    font-size: 13px;
+    font-weight: 650;
+}
+
 .painel-etapa {
     display: flex;
     align-items: center;
@@ -602,6 +713,11 @@ main {
     .conteudo-servicos {
         grid-template-columns: 1fr;
     }
+
+    .grade-servicos,
+    .grade-profissionais {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 680px) {
@@ -685,6 +801,20 @@ main {
         align-items: stretch;
         flex-direction: column;
         padding: 24px;
+    }
+
+    .grade-servicos,
+    .grade-profissionais {
+        grid-template-columns: 1fr;
+    }
+
+    .profissional-topo {
+        grid-template-columns: auto 1fr;
+    }
+
+    .disponibilidade {
+        grid-column: 1 / -1;
+        justify-self: start;
     }
 }
 

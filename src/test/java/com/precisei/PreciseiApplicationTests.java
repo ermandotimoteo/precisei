@@ -38,7 +38,8 @@ class PreciseiApplicationTests {
         mockMvc.perform(get("/servicos"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("servicos"))
-                .andExpect(model().attributeExists("categorias", "novaCategoria"));
+                .andExpect(model().attributeExists("categorias", "servicos", "novaCategoria"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Reparo de vazamento")));
     }
 
     @Test
@@ -46,8 +47,9 @@ class PreciseiApplicationTests {
         mockMvc.perform(get("/profissionais"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profissionais"))
-                .andExpect(model().attributeExists("categorias"))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Faxina")));
+                .andExpect(model().attributeExists("profissionais"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Carlos Oliveira")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Faxina residencial")));
     }
 
     @Test

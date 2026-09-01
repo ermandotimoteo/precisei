@@ -27,41 +27,59 @@
         <section class="cabecalho-pagina" aria-labelledby="titulo-profissionais">
             <div>
                 <p class="rotulo">Profissionais</p>
-                <h2 id="titulo-profissionais">Encontre a área que você precisa</h2>
-                <p>Conheça as categorias disponíveis nesta solução inicial do Precisei.</p>
+                <h2 id="titulo-profissionais">Encontre quem pode ajudar</h2>
+                <p>Conheça os profissionais cadastrados e os serviços oferecidos.</p>
             </div>
             <span class="cabecalho-pagina-icone" aria-hidden="true">⌕</span>
         </section>
 
         <section class="painel-etapa" aria-labelledby="titulo-etapa">
             <div class="painel-etapa-conteudo">
-                <p class="rotulo">Solução inicial</p>
-                <h2 id="titulo-etapa">Áreas de atendimento</h2>
+                <p class="rotulo">Dados reais</p>
+                <h2 id="titulo-etapa">Profissionais no Precisei</h2>
                 <p>
-                    As categorias abaixo são carregadas diretamente do banco de dados.
-                    O cadastro e os perfis individuais dos profissionais fazem parte da próxima etapa do projeto.
+                    Os perfis abaixo e seus serviços são carregados diretamente do banco de dados.
+                    A solicitação de atendimento será implementada em uma próxima etapa.
                 </p>
             </div>
             <a class="botao" th:href="@{/servicos}" href="/servicos">Consultar serviços</a>
         </section>
 
-        <section class="secao-categorias" aria-labelledby="titulo-areas">
+        <section class="secao-categorias" aria-labelledby="titulo-lista-profissionais">
             <div class="secao-cabecalho">
                 <div>
-                    <p class="rotulo">Categorias cadastradas</p>
-                    <h2 id="titulo-areas">Serviços previstos</h2>
+                    <p class="rotulo">Perfis cadastrados</p>
+                    <h2 id="titulo-lista-profissionais">Profissionais disponíveis</h2>
                 </div>
             </div>
 
-            <div class="categorias">
-                <article th:each="categoria : ${categorias}">
-                    <span th:replace="~{fragments/categoria-icone :: icone(${categoria})}"></span>
-                    <h3 th:text="${categoria.nome}">Nome da categoria</h3>
-                    <p>Área disponível para organização e futura busca de profissionais.</p>
+            <div class="grade-profissionais">
+                <article class="cartao-profissional" th:each="profissional : ${profissionais}">
+                    <div class="profissional-topo">
+                        <span class="avatar" aria-hidden="true"
+                            th:text="${#strings.substring(profissional.nome, 0, 1)}">P</span>
+                        <div>
+                            <h3 th:text="${profissional.nome}">Nome do profissional</h3>
+                            <p th:text="|${profissional.bairro}, ${profissional.cidade}|">Localização</p>
+                        </div>
+                        <span class="disponibilidade"
+                            th:classappend="${profissional.disponivel} ? ' disponivel' : ' indisponivel'"
+                            th:text="${profissional.disponivel} ? 'Disponível' : 'Indisponível'">
+                            Disponível
+                        </span>
+                    </div>
+                    <p class="descricao-profissional" th:text="${profissional.descricao}">
+                        Apresentação profissional.
+                    </p>
+                    <h4>Serviços oferecidos</h4>
+                    <ul class="lista-servicos-profissional">
+                        <li th:each="servico : ${profissional.servicos}"
+                            th:text="${servico.nome}">Serviço</li>
+                    </ul>
                 </article>
 
-                <p class="estado-vazio" th:if="${#lists.isEmpty(categorias)}">
-                    Nenhuma categoria foi cadastrada ainda.
+                <p class="estado-vazio" th:if="${#lists.isEmpty(profissionais)}">
+                    Nenhum profissional foi cadastrado ainda.
                 </p>
             </div>
         </section>

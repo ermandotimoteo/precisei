@@ -2,7 +2,7 @@
 
 Este documento registra a modelagem conceitual e lógica aprovada para o Módulo 3 do Precisei.
 
-O modelo representa a evolução do banco de dados. Sua estrutura física foi criada na migração Flyway V1; no código Java, somente a entidade `Categoria` está mapeada nesta etapa. As demais entidades serão adicionadas incrementalmente nas próximas etapas.
+O modelo representa a evolução do banco de dados. Sua estrutura física foi criada na migração Flyway V1 e todas as entidades do DER já possuem mapeamento JPA. As funcionalidades de escrita pela interface continuarão sendo adicionadas incrementalmente.
 
 ## Objetivo da modelagem
 

@@ -13,27 +13,27 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
 
-import com.precisei.model.Categoria;
-import com.precisei.service.CategoriaService;
+import com.precisei.model.Profissional;
+import com.precisei.service.ProfissionalService;
 
 @ExtendWith(MockitoExtension.class)
 class ProfissionalControllerTests {
 
     @Mock
-    private CategoriaService categoriaService;
+    private ProfissionalService profissionalService;
 
     @InjectMocks
     private ProfissionalController profissionalController;
 
     @Test
-    void deveExibirProfissionaisComCategorias() {
-        List<Categoria> categorias = List.of(new Categoria("Faxina"));
-        when(categoriaService.listarTodas()).thenReturn(categorias);
+    void deveExibirProfissionaisDoBanco() {
+        List<Profissional> profissionais = List.of();
+        when(profissionalService.listarTodos()).thenReturn(profissionais);
         ExtendedModelMap model = new ExtendedModelMap();
 
         String view = profissionalController.listar(model);
 
         assertEquals("profissionais", view);
-        assertSame(categorias, model.get("categorias"));
+        assertSame(profissionais, model.get("profissionais"));
     }
 }

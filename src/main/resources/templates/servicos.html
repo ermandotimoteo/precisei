@@ -28,13 +28,37 @@
             <div>
                 <p class="rotulo">Categorias</p>
                 <h2 id="titulo-servicos">Serviços disponíveis</h2>
-                <p>Consulte e organize as categorias utilizadas para encontrar profissionais no Precisei.</p>
+                <p>Consulte os serviços reais e organize as categorias utilizadas no Precisei.</p>
             </div>
             <span class="cabecalho-pagina-icone" aria-hidden="true">✓</span>
         </section>
 
         <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}"
             th:text="${mensagemSucesso}"></p>
+
+        <section class="secao-listagem" aria-labelledby="titulo-servicos-cadastrados">
+            <div class="secao-cabecalho">
+                <div>
+                    <p class="rotulo">Catálogo</p>
+                    <h2 id="titulo-servicos-cadastrados">Serviços cadastrados</h2>
+                </div>
+            </div>
+
+            <div class="grade-servicos">
+                <article class="cartao-servico" th:each="servico : ${servicos}">
+                    <p class="etiqueta-categoria" th:text="${servico.categoria.nome}">Categoria</p>
+                    <h3 th:text="${servico.nome}">Nome do serviço</h3>
+                    <p th:text="${servico.descricao}">Descrição do serviço</p>
+                    <p class="preco" th:if="${servico.precoReferencia != null}">
+                        A partir de
+                        <strong th:text="${#numbers.formatCurrency(servico.precoReferencia)}">R$ 0,00</strong>
+                    </p>
+                </article>
+                <p class="estado-vazio" th:if="${#lists.isEmpty(servicos)}">
+                    Nenhum serviço foi cadastrado ainda.
+                </p>
+            </div>
+        </section>
 
         <div class="conteudo-servicos">
             <section aria-labelledby="titulo-categorias">
