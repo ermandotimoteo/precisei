@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Precisei</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+    <header class="cabecalho-site"><nav aria-label="Navegação principal"><a class="marca" th:href="@{/}" aria-label="Precisei - Página inicial"><span class="marca-icone" aria-hidden="true">P</span><h1>Precisei</h1></a><ul><li><a th:href="@{/}">Início</a></li><li><a th:href="@{/profissionais}">Profissionais</a></li><li><a th:href="@{/servicos}">Serviços</a></li><li><a th:href="@{/clientes}" aria-current="page">Clientes</a></li><li><a th:href="@{/solicitacoes}">Solicitações</a></li></ul></nav></header>
+    <main>
+        <section class="cabecalho-pagina"><div><p class="rotulo">Clientes</p><h2>Cadastro de clientes</h2><p>Cadastre quem solicita os serviços e consulte os registros existentes.</p></div><span class="cabecalho-pagina-icone" aria-hidden="true">☺</span></section>
+        <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></p>
+        <div class="layout-cadastro-lista">
+            <section class="painel-formulario" aria-labelledby="titulo-novo-cliente">
+                <h2 id="titulo-novo-cliente">Novo cliente</h2><p>A senha será armazenada somente como hash BCrypt.</p>
+                <form th:action="@{/clientes/novo}" th:object="${clienteForm}" method="post">
+                    <div class="campo"><label for="cliente-nome">Nome</label><input id="cliente-nome" th:field="*{nome}" maxlength="120"><p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p></div>
+                    <div class="campo"><label for="cliente-telefone">Telefone</label><input id="cliente-telefone" th:field="*{telefone}" maxlength="20"><p class="erro" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></p></div>
+                    <div class="campo"><label for="cliente-email">E-mail</label><input id="cliente-email" type="email" th:field="*{email}" maxlength="160"><p class="erro" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p></div>
+                    <div class="campo"><label for="cliente-senha">Senha</label><input id="cliente-senha" type="password" th:field="*{senha}" minlength="8" autocomplete="new-password"><p class="erro" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p></div>
+                    <button class="botao" type="submit">Cadastrar cliente</button>
+                </form>
+            </section>
+            <section aria-labelledby="titulo-clientes-cadastrados">
+                <div class="secao-cabecalho"><div><p class="rotulo">Base cadastrada</p><h2 id="titulo-clientes-cadastrados">Clientes</h2></div></div>
+                <div class="lista-clientes">
+                    <article th:each="cliente : ${clientes}"><span class="avatar" aria-hidden="true" th:text="${#strings.substring(cliente.nome,0,1)}">C</span><div><h3 th:text="${cliente.nome}">Cliente</h3><p th:text="${cliente.email}">E-mail</p><p th:text="${cliente.telefone}">Telefone</p></div></article>
+                    <p class="estado-vazio" th:if="${#lists.isEmpty(clientes)}">Nenhum cliente cadastrado.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer class="rodape-site"><p>© 2026 Precisei - Projeto Integrador de Tecnologia da Informação II</p></footer>
+</body></html>

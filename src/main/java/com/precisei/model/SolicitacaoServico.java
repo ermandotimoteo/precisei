@@ -1,6 +1,7 @@
 package com.precisei.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,6 +52,35 @@ public class SolicitacaoServico {
     private Servico servico;
 
     protected SolicitacaoServico() {
+    }
+
+    public SolicitacaoServico(LocalDateTime dataAgendada, String descricao,
+            String observacoes, Cliente cliente, Profissional profissional,
+            Servico servico) {
+        this.dataSolicitacao = LocalDateTime.now();
+        this.dataAgendada = dataAgendada;
+        this.status = StatusSolicitacao.PENDENTE;
+        this.descricao = descricao.trim();
+        this.observacoes = observacoes == null ? null : observacoes.trim();
+        this.cliente = cliente;
+        this.profissional = profissional;
+        this.servico = servico;
+    }
+
+    public Set<StatusSolicitacao> getProximosStatus() {
+        return switch (status) {
+            case PENDENTE -> Set.of(StatusSolicitacao.ACEITA, StatusSolicitacao.CANCELADA);
+            case ACEITA -> Set.of(StatusSolicitacao.EM_ANDAMENTO, StatusSolicitacao.CANCELADA);
+            case EM_ANDAMENTO -> Set.of(StatusSolicitacao.CONCLUIDA, StatusSolicitacao.CANCELADA);
+            case CONCLUIDA, CANCELADA -> Set.of();
+        };
+    }
+
+    public void alterarStatus(StatusSolicitacao novoStatus) {
+        if (!getProximosStatus().contains(novoStatus)) {
+            throw new IllegalStateException("Transição de status não permitida.");
+        }
+        this.status = novoStatus;
     }
 
     public Long getId() { return id; }

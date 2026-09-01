@@ -1,6 +1,6 @@
 # Regras de integridade e negócio
 
-As regras abaixo orientam tanto o esquema SQL quanto as futuras validações no Spring. Elas separam o que deve ser garantido diretamente pelo banco do que depende do fluxo da aplicação.
+As regras abaixo orientam o esquema SQL e as validações no Spring. Elas separam o que deve ser garantido diretamente pelo banco do que depende do fluxo da aplicação.
 
 ## Regras garantidas pelo banco
 
@@ -38,15 +38,15 @@ As regras abaixo orientam tanto o esquema SQL quanto as futuras validações no 
 
 ## Regras garantidas pela aplicação
 
-- textos recebidos pelos formulários serão normalizados antes da persistência;
-- e-mails serão validados antes do cadastro;
-- senhas serão transformadas em hash antes de serem armazenadas;
+- textos recebidos pelos formulários são normalizados antes da persistência;
+- e-mails são validados antes do cadastro;
+- novas senhas são transformadas em hash antes de serem armazenadas;
 - um profissional só poderá receber solicitação de um serviço que oferece;
 - somente solicitações concluídas poderão ser avaliadas;
-- mudanças de status deverão respeitar o fluxo permitido;
-- mensagens de validação deverão ser compreensíveis na interface.
+- mudanças de status respeitam o fluxo permitido;
+- mensagens de validação são apresentadas de forma compreensível na interface.
 
-## Fluxo planejado de status
+## Fluxo implementado de status
 
 ```mermaid
 stateDiagram-v2
@@ -90,4 +90,3 @@ Por isso:
 - serviços de profissionais ficam em uma tabela associativa;
 - cliente e profissional não são repetidos em avaliação;
 - média de avaliação é calculada por consulta.
-

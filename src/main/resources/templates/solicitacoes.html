@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações - Precisei</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+    <header class="cabecalho-site"><nav aria-label="Navegação principal"><a class="marca" th:href="@{/}" aria-label="Precisei - Página inicial"><span class="marca-icone" aria-hidden="true">P</span><h1>Precisei</h1></a><ul><li><a th:href="@{/}">Início</a></li><li><a th:href="@{/profissionais}">Profissionais</a></li><li><a th:href="@{/servicos}">Serviços</a></li><li><a th:href="@{/clientes}">Clientes</a></li><li><a th:href="@{/solicitacoes}" aria-current="page">Solicitações</a></li></ul></nav></header>
+    <main>
+        <section class="cabecalho-pagina"><div><p class="rotulo">Atendimentos</p><h2>Solicitações de serviço</h2><p>Registre atendimentos e acompanhe cada etapa até a conclusão.</p></div><span class="cabecalho-pagina-icone" aria-hidden="true">✓</span></section>
+        <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></p>
+        <section class="painel-formulario cadastro-principal" aria-labelledby="titulo-nova-solicitacao">
+            <h2 id="titulo-nova-solicitacao">Nova solicitação</h2><p>O profissional selecionado deve estar disponível e oferecer o serviço escolhido.</p>
+            <form th:action="@{/solicitacoes/novo}" th:object="${solicitacaoForm}" method="post">
+                <div class="grade-campos">
+                    <div class="campo"><label for="sol-cliente">Cliente</label><select id="sol-cliente" th:field="*{clienteId}"><option value="">Selecione</option><option th:each="cliente : ${clientes}" th:value="${cliente.id}" th:text="${cliente.nome}"></option></select><p class="erro" th:if="${#fields.hasErrors('clienteId')}" th:errors="*{clienteId}"></p></div>
+                    <div class="campo"><label for="sol-profissional">Profissional</label><select id="sol-profissional" th:field="*{profissionalId}"><option value="">Selecione</option><option th:each="profissional : ${profissionais}" th:value="${profissional.id}" th:text="|${profissional.nome} — ${profissional.disponivel ? 'Disponível' : 'Indisponível'}|"></option></select><p class="erro" th:if="${#fields.hasErrors('profissionalId')}" th:errors="*{profissionalId}"></p></div>
+                    <div class="campo"><label for="sol-servico">Serviço</label><select id="sol-servico" th:field="*{servicoId}"><option value="">Selecione</option><option th:each="servico : ${servicos}" th:value="${servico.id}" th:text="${servico.nome}"></option></select><p class="erro" th:if="${#fields.hasErrors('servicoId')}" th:errors="*{servicoId}"></p></div>
+                    <div class="campo"><label for="sol-data">Data agendada</label><input id="sol-data" type="datetime-local" th:field="*{dataAgendada}"><p class="erro" th:if="${#fields.hasErrors('dataAgendada')}" th:errors="*{dataAgendada}"></p></div>
+                    <div class="campo campo-largo"><label for="sol-descricao">Descrição do atendimento</label><textarea id="sol-descricao" th:field="*{descricao}" maxlength="1000" rows="3"></textarea><p class="erro" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></p></div>
+                    <div class="campo campo-largo"><label for="sol-observacoes">Observações</label><textarea id="sol-observacoes" th:field="*{observacoes}" maxlength="1000" rows="2"></textarea><p class="erro" th:if="${#fields.hasErrors('observacoes')}" th:errors="*{observacoes}"></p></div>
+                </div>
+                <button class="botao" type="submit">Enviar solicitação</button>
+            </form>
+        </section>
+        <section aria-labelledby="titulo-acompanhamento">
+            <div class="secao-cabecalho"><div><p class="rotulo">Acompanhamento</p><h2 id="titulo-acompanhamento">Solicitações cadastradas</h2></div></div>
+            <div class="grade-solicitacoes">
+                <article class="cartao-solicitacao" th:each="solicitacao : ${solicitacoes}">
+                    <div class="solicitacao-topo"><span class="status-solicitacao" th:classappend="| status-${#strings.toLowerCase(solicitacao.status.name())}|" th:text="${solicitacao.status.descricao}">Status</span><time th:text="${#temporals.format(solicitacao.dataSolicitacao, 'dd/MM/yyyy HH:mm')}">Data</time></div>
+                    <h3 th:text="${solicitacao.servico.nome}">Serviço</h3><p th:text="${solicitacao.descricao}">Descrição</p>
+                    <dl><div><dt>Cliente</dt><dd th:text="${solicitacao.cliente.nome}">Cliente</dd></div><div><dt>Profissional</dt><dd th:text="${solicitacao.profissional.nome}">Profissional</dd></div><div><dt>Agendamento</dt><dd th:text="${solicitacao.dataAgendada != null ? #temporals.format(solicitacao.dataAgendada, 'dd/MM/yyyy HH:mm') : 'A combinar'}">Data</dd></div></dl>
+                    <div class="acoes-status" th:if="${!solicitacao.proximosStatus.isEmpty()}"><form th:each="proximo : ${solicitacao.proximosStatus}" th:action="@{/solicitacoes/{id}/status(id=${solicitacao.id})}" method="post"><input type="hidden" name="status" th:value="${proximo.name()}"><button class="botao botao-status" type="submit" th:text="|Marcar: ${proximo.descricao}|">Atualizar</button></form></div>
+                </article>
+                <p class="estado-vazio" th:if="${#lists.isEmpty(solicitacoes)}">Nenhuma solicitação cadastrada.</p>
+            </div>
+        </section>
+    </main>
+    <footer class="rodape-site"><p>© 2026 Precisei - Projeto Integrador de Tecnologia da Informação II</p></footer>
+</body></html>

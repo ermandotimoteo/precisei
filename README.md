@@ -32,7 +32,7 @@ O público-alvo conceitual é formado por:
 ## Funcionalidades implementadas
 
 - página inicial responsiva;
-- navegação entre Início, Profissionais e Serviços;
+- navegação entre Início, Serviços, Profissionais, Clientes e Solicitações;
 - listagem dinâmica de categorias armazenadas no MySQL;
 - cadastro de categorias de serviço;
 - validação de nome obrigatório e tamanho máximo;
@@ -47,6 +47,11 @@ O público-alvo conceitual é formado por:
 - cadastro e edição de serviços com categoria e preço de referência;
 - cadastro e edição de profissionais com associação a vários serviços;
 - armazenamento de novas senhas profissionais com hash BCrypt;
+- cadastro e listagem de clientes, com validação de e-mail único e senha protegida por BCrypt;
+- criação de solicitações com cliente, profissional, serviço, descrição e agendamento opcional;
+- validação da disponibilidade do profissional e dos serviços que ele oferece;
+- listagem e acompanhamento das solicitações;
+- atualização controlada do status entre Pendente, Aceita, Em andamento, Concluída e Cancelada;
 - testes unitários e de integração.
 
 Categorias iniciais:
@@ -64,10 +69,8 @@ Esta versão representa uma **solução inicial dinâmica para o Módulo 2**, e 
 
 Ainda não foram implementados pela interface:
 
-- cadastro e autenticação de usuários;
+- autenticação de usuários;
 - pesquisa de profissionais por localização e disponibilidade;
-- solicitação de atendimento;
-- acompanhamento de status;
 - avaliações de profissionais.
 
 Essas funcionalidades estão previstas para etapas futuras do projeto.
@@ -223,6 +226,11 @@ Para interromper a execução, pressione `Ctrl + C`.
 | POST | `/profissionais/novo` | Valida e cadastra um profissional |
 | GET | `/profissionais/{id}/editar` | Exibe o formulário de edição do profissional |
 | POST | `/profissionais/{id}/editar` | Atualiza um profissional |
+| GET | `/clientes` | Lista clientes e apresenta o formulário de cadastro |
+| POST | `/clientes/novo` | Valida e cadastra um cliente |
+| GET | `/solicitacoes` | Lista solicitações e apresenta o formulário de criação |
+| POST | `/solicitacoes/novo` | Valida e cria uma solicitação |
+| POST | `/solicitacoes/{id}/status` | Atualiza o status conforme as transições permitidas |
 
 ## Como executar os testes
 
@@ -232,7 +240,7 @@ Com o MySQL iniciado e a variável `DB_PASSWORD` configurada, execute:
 .\mvnw.cmd test
 ```
 
-Na última validação foram executados **22 testes**, sem falhas ou erros.
+Na última validação foram executados **33 testes**, sem falhas ou erros.
 
 ## Responsividade e acessibilidade
 
@@ -250,11 +258,9 @@ Também foram aplicados:
 
 ## Próximas etapas
 
-- implementar os perfis reais de profissionais;
 - permitir filtros por categoria, localização e disponibilidade;
-- implementar solicitações e atualização de status;
 - adicionar autenticação em uma etapa posterior;
-- implementar avaliações após a conclusão do fluxo principal.
+- implementar avaliações para solicitações concluídas.
 
 ## Contexto acadêmico
 

@@ -31,6 +31,13 @@ public class Cliente {
     protected Cliente() {
     }
 
+    public Cliente(String nome, String telefone, String email, String senhaHash) {
+        this.nome = nome.trim();
+        this.telefone = telefone.trim();
+        this.email = email.trim().toLowerCase();
+        this.senhaHash = senhaHash;
+    }
+
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getTelefone() { return telefone; }

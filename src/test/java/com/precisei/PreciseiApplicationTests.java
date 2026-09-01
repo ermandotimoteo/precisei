@@ -60,4 +60,22 @@ class PreciseiApplicationTests {
                 .andExpect(model().attributeHasFieldErrors("novaCategoria", "nome"));
     }
 
+    @Test
+    void deveExibirPaginaDeClientes() throws Exception {
+        mockMvc.perform(get("/clientes"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("clientes"))
+                .andExpect(model().attributeExists("clientes", "clienteForm"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Maria Souza")));
+    }
+
+    @Test
+    void deveExibirPaginaDeSolicitacoes() throws Exception {
+        mockMvc.perform(get("/solicitacoes"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("solicitacoes"))
+                .andExpect(model().attributeExists("solicitacoes", "solicitacaoForm"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Reparo de vazamento")));
+    }
+
 }
