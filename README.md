@@ -113,6 +113,14 @@ A migração inicial está em [`V1__criar_esquema_inicial.sql`](src/main/resourc
 
 O Hibernate está configurado com `ddl-auto=validate`: ele verifica o mapeamento das entidades, mas não altera o banco silenciosamente. As mudanças estruturais passam a ser responsabilidade das migrações SQL versionadas.
 
+A migração [`V2__inserir_dados_demonstracao.sql`](src/main/resources/db/migration/V2__inserir_dados_demonstracao.sql) fornece dados relacionados para testar o modelo. As operações exigidas no Módulo 3 estão disponíveis em:
+
+- [`01_consultas.sql`](docs/sql/01_consultas.sql): consultas simples, relacionais, agregações e filtros;
+- [`02_atualizacoes.sql`](docs/sql/02_atualizacoes.sql): atualizações demonstradas dentro de uma transação reversível;
+- [`03_remocoes.sql`](docs/sql/03_remocoes.sql): remoções seguras de registros temporários;
+- [`04_testes_integridade.sql`](docs/sql/04_testes_integridade.sql): tentativas inválidas para comprovar restrições;
+- [evidências da execução](docs/banco/evidencias-crud.md): resultados observados no MySQL.
+
 ## Estrutura principal
 
 ```text
@@ -231,7 +239,6 @@ Também foram aplicados:
 
 ## Próximas etapas
 
-- documentar operações de inserção, consulta, atualização e remoção;
 - implementar as entidades JPA correspondentes ao novo esquema;
 - implementar os perfis reais de profissionais;
 - relacionar profissionais aos serviços oferecidos;
