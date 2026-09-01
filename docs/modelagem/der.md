@@ -2,7 +2,7 @@
 
 Este documento registra a modelagem conceitual e lógica aprovada para o Módulo 3 do Precisei.
 
-O modelo representa a evolução planejada do banco de dados. No início desta etapa, somente a entidade `Categoria` está implementada na aplicação e no MySQL. As demais entidades serão adicionadas incrementalmente nas próximas etapas.
+O modelo representa a evolução do banco de dados. Sua estrutura física foi criada na migração Flyway V1; no código Java, somente a entidade `Categoria` está mapeada nesta etapa. As demais entidades serão adicionadas incrementalmente nas próximas etapas.
 
 ## Objetivo da modelagem
 
@@ -178,4 +178,3 @@ Os estados permitidos serão:
 7. Avaliação.
 
 Essa ordem reduz dependências incompletas e permite testar cada relacionamento antes de avançar.
-

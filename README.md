@@ -21,6 +21,7 @@ O público-alvo conceitual é formado por:
 - Thymeleaf;
 - Spring Data JPA;
 - Hibernate;
+- Flyway para versionamento do esquema SQL;
 - Spring Validation;
 - MySQL 8;
 - HTML5;
@@ -98,7 +99,19 @@ A evolução planejada do banco está documentada em:
 - [Dicionário de dados](docs/modelagem/dicionario-de-dados.md);
 - [Regras de integridade e negócio](docs/modelagem/regras-de-integridade.md).
 
-O modelo inclui Categoria, Serviço, Profissional, Cliente, Solicitação de Serviço e Avaliação, além da associação muitos para muitos entre profissionais e serviços. A implementação ocorrerá incrementalmente e os documentos distinguem entidades planejadas daquelas que já existem no código.
+O modelo inclui Categoria, Serviço, Profissional, Cliente, Solicitação de Serviço e Avaliação, além da associação muitos para muitos entre profissionais e serviços. O esquema correspondente está implementado em uma migração Flyway e continuará evoluindo incrementalmente.
+
+### Esquema SQL versionado
+
+A migração inicial está em [`V1__criar_esquema_inicial.sql`](src/main/resources/db/migration/V1__criar_esquema_inicial.sql). Ela:
+
+- preserva as categorias cadastradas no Módulo 2;
+- padroniza a chave primária como `id_categoria`;
+- cria as tabelas, chaves estrangeiras e restrições do DER;
+- cria índices para as consultas planejadas;
+- é registrada automaticamente na tabela `flyway_schema_history`.
+
+O Hibernate está configurado com `ddl-auto=validate`: ele verifica o mapeamento das entidades, mas não altera o banco silenciosamente. As mudanças estruturais passam a ser responsabilidade das migrações SQL versionadas.
 
 ## Estrutura principal
 
@@ -114,6 +127,7 @@ src/
 │   └── resources/
 │       ├── static/css/   # Estilização responsiva
 │       ├── templates/    # Páginas e fragmentos Thymeleaf
+│       ├── db/migration/ # Migrações SQL executadas pelo Flyway
 │       └── application.properties
 └── test/java/com/precisei/ # Testes unitários e de integração
 ```
@@ -132,13 +146,15 @@ Não é necessário instalar o Maven separadamente, pois o projeto contém o Mav
 
 1. Inicie o servidor MySQL.
 
-2. Crie o banco de dados:
+2. Crie apenas o banco de dados vazio:
 
 ```sql
 CREATE DATABASE precisei
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 ```
+
+Não crie as tabelas manualmente. Ao iniciar a aplicação, o Flyway executará as migrações pendentes. Se você já utilizava o banco da versão anterior, a primeira migração preservará as categorias existentes e criará o restante do esquema.
 
 3. Configure a senha do MySQL por variável de ambiente.
 
@@ -215,8 +231,8 @@ Também foram aplicados:
 
 ## Próximas etapas
 
-- implementar o esquema SQL versionado do Módulo 3;
 - documentar operações de inserção, consulta, atualização e remoção;
+- implementar as entidades JPA correspondentes ao novo esquema;
 - implementar os perfis reais de profissionais;
 - relacionar profissionais aos serviços oferecidos;
 - permitir filtros por categoria, localização e disponibilidade;

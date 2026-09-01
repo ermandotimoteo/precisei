@@ -1,6 +1,6 @@
 # Dicionário de dados
 
-Este dicionário descreve o modelo lógico planejado para o Módulo 3. Os tipos foram definidos para MySQL 8 e poderão receber pequenos ajustes durante a criação dos scripts SQL, desde que as regras de negócio sejam preservadas.
+Este dicionário descreve o modelo lógico implementado para o Módulo 3. Os tipos foram definidos para MySQL 8 e materializados na migração `V1__criar_esquema_inicial.sql`.
 
 ## Tabela `categorias`
 
@@ -15,7 +15,7 @@ Restrições:
 - `nome` obrigatório e exclusivo;
 - remoção impedida quando existirem serviços relacionados.
 
-Situação: entidade equivalente já implementada no projeto com o atributo Java `id` e a coluna física atual `id`. Na etapa de esquema SQL, essa coluna será migrada de forma controlada para `id_categoria`, preservando os registros existentes e alinhando a implementação à nomenclatura do modelo lógico.
+Situação: a migração V1 renomeia de forma controlada a coluna física anterior `id` para `id_categoria`, preservando os registros existentes. O atributo Java continua se chamando `id` e declara explicitamente seu vínculo com `id_categoria`.
 
 ## Tabela `servicos`
 
