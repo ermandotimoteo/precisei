@@ -2,7 +2,7 @@
 
 O **Precisei** é uma aplicação web acadêmica criada para organizar categorias de pequenos serviços domésticos e apoiar, em etapas futuras, a conexão entre moradores e profissionais autônomos.
 
-O projeto faz parte do **Projeto Integrador de Tecnologia da Informação II** e, nesta entrega do Módulo 2, demonstra o desenvolvimento de uma solução web dinâmica, responsiva e integrada a um banco de dados relacional.
+O projeto faz parte do **Projeto Integrador de Tecnologia da Informação II**. O Módulo 2 entregou uma solução web dinâmica, responsiva e integrada ao MySQL. No Módulo 3, o projeto evolui a modelagem, a manipulação do banco de dados e o histórico de versionamento no Git.
 
 ## Objetivo
 
@@ -89,6 +89,16 @@ As páginas são renderizadas pelo Thymeleaf:
 ```text
 Controller → Model → Thymeleaf → HTML → CSS
 ```
+
+## Modelagem de dados — Módulo 3
+
+A evolução planejada do banco está documentada em:
+
+- [Modelo de dados e DER](docs/modelagem/der.md);
+- [Dicionário de dados](docs/modelagem/dicionario-de-dados.md);
+- [Regras de integridade e negócio](docs/modelagem/regras-de-integridade.md).
+
+O modelo inclui Categoria, Serviço, Profissional, Cliente, Solicitação de Serviço e Avaliação, além da associação muitos para muitos entre profissionais e serviços. A implementação ocorrerá incrementalmente e os documentos distinguem entidades planejadas daquelas que já existem no código.
 
 ## Estrutura principal
 
@@ -205,16 +215,18 @@ Também foram aplicados:
 
 ## Próximas etapas
 
+- implementar o esquema SQL versionado do Módulo 3;
+- documentar operações de inserção, consulta, atualização e remoção;
 - implementar os perfis reais de profissionais;
-- relacionar profissionais às categorias;
+- relacionar profissionais aos serviços oferecidos;
 - permitir filtros por categoria, localização e disponibilidade;
 - implementar solicitações e atualização de status;
 - adicionar autenticação em uma etapa posterior;
-- publicar o código no GitHub e inserir o endereço do repositório no relatório.
+- implementar avaliações após a conclusão do fluxo principal.
 
 ## Contexto acadêmico
 
-Projeto desenvolvido para o **Projeto Integrador de Tecnologia da Informação II**, no Módulo 2 de Desenvolvimento Web com frameworks e HTML/CSS.
+Projeto desenvolvido para o **Projeto Integrador de Tecnologia da Informação II**. O Módulo 2 abordou desenvolvimento web com frameworks e HTML/CSS; o Módulo 3 aborda modelagem, manipulação de banco de dados e controle de versão.
 
 Local de referência do projeto: João Pessoa - PB, Brasil.
 
