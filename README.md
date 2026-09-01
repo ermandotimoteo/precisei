@@ -130,6 +130,7 @@ A migração [`V2__inserir_dados_demonstracao.sql`](src/main/resources/db/migrat
 - [`03_remocoes.sql`](docs/sql/03_remocoes.sql): remoções seguras de registros temporários;
 - [`04_testes_integridade.sql`](docs/sql/04_testes_integridade.sql): tentativas inválidas para comprovar restrições;
 - [evidências da execução](docs/banco/evidencias-crud.md): resultados observados no MySQL.
+- [auditoria dos requisitos do Módulo 3](docs/auditoria-modulo-3.md): correspondência entre requisitos, implementação e evidências.
 
 ## Estrutura principal
 

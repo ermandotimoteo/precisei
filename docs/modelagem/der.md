@@ -2,7 +2,7 @@
 
 Este documento registra a modelagem conceitual e lógica aprovada para o Módulo 3 do Precisei.
 
-O modelo representa a evolução do banco de dados. Sua estrutura física foi criada na migração Flyway V1 e todas as entidades do DER já possuem mapeamento JPA. As funcionalidades de escrita pela interface continuarão sendo adicionadas incrementalmente.
+O modelo representa a evolução do banco de dados. Sua estrutura física foi criada na migração Flyway V1, todas as entidades possuem mapeamento JPA e os fluxos principais de escrita estão disponíveis pela interface.
 
 ## Objetivo da modelagem
 
@@ -157,7 +157,7 @@ Nesta versão, a localização será representada por cidade e bairro. Geolocali
 
 ## Estados da solicitação
 
-Os estados permitidos serão:
+Os estados permitidos são:
 
 | Estado | Significado |
 |---|---|

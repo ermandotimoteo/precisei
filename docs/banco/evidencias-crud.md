@@ -8,13 +8,13 @@ Os scripts desta etapa foram executados em 1º de setembro de 2026 no MySQL 8.0.
 |---|---:|
 | `categorias` | 6 |
 | `servicos` | 4 |
-| `profissionais` | 3 |
+| `profissionais` | 4 |
 | `clientes` | 2 |
-| `profissionais_servicos` | 4 |
+| `profissionais_servicos` | 5 |
 | `solicitacoes_servico` | 3 |
 | `avaliacoes` | 1 |
 
-Os registros incluem três profissionais, dois clientes, quatro serviços, associações muitos para muitos, solicitações em estados diferentes e uma avaliação de uma solicitação concluída.
+Os dados demonstrativos originais incluem três profissionais e a aplicação contém ainda um quarto perfil cadastrado pela interface. Também foram confirmados dois clientes, quatro serviços, cinco associações muitos para muitos, solicitações em estados diferentes e uma avaliação de uma solicitação concluída.
 
 ## Consultas executadas
 
@@ -32,7 +32,7 @@ Resultados relevantes:
 - foram retornados quatro serviços com suas categorias;
 - as três solicitações retornaram os estados `CONCLUIDA`, `ACEITA` e `PENDENTE`;
 - Carlos Oliveira obteve média `5,00` a partir de uma avaliação;
-- a consulta por profissional disponível para reparo de vazamento retornou Marcos Santos.
+- a consulta por profissional disponível para reparo de vazamento retornou Marcos Santos e Jose carlos, refletindo os dados atuais da aplicação.
 
 ## Atualizações executadas
 
@@ -66,6 +66,8 @@ Os comandos de [`04_testes_integridade.sql`](../sql/04_testes_integridade.sql) f
 | Excluir categoria utilizada | `fk_servicos_categoria` | 1451 |
 
 As falhas são o resultado correto: nenhuma operação inválida foi persistida.
+
+Após os testes, uma consulta de controle confirmou a preservação dos valores originais: preço `120,00`, solicitação no estado `ACEITA`, avaliação com nota `5` e categoria Elétrica ainda cadastrada.
 
 ## Como reproduzir
 
