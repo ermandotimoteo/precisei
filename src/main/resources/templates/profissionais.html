@@ -66,11 +66,11 @@
                 <p class="rotulo">Dados reais</p>
                 <h2 id="titulo-etapa">Profissionais no Precisei</h2>
                 <p>
-                    Os perfis abaixo e seus serviços são carregados diretamente do banco de dados.
-                    A solicitação de atendimento será implementada em uma próxima etapa.
+                    Os perfis, serviços oferecidos e médias de avaliação são carregados
+                    diretamente do banco de dados.
                 </p>
             </div>
-            <a class="botao" th:href="@{/servicos}" href="/servicos">Consultar serviços</a>
+            <a class="botao" th:href="@{/solicitacoes}" href="/solicitacoes">Consultar solicitações</a>
         </section>
 
         <section class="secao-categorias" aria-labelledby="titulo-lista-profissionais">
@@ -99,6 +99,14 @@
                     <p class="descricao-profissional" th:text="${profissional.descricao}">
                         Apresentação profissional.
                     </p>
+                    <p class="resumo-avaliacao" th:if="${mediasAvaliacoes[profissional.id] != null}">
+                        <span class="estrelas" aria-hidden="true">★</span>
+                        <strong th:text="${#numbers.formatDecimal(mediasAvaliacoes[profissional.id], 1, 1)}">5,0</strong>
+                        <span th:text="${quantidadesAvaliacoes[profissional.id] == 1
+                                ? '(1 avaliação)'
+                                : '(' + quantidadesAvaliacoes[profissional.id] + ' avaliações)'}">(1 avaliação)</span>
+                    </p>
+                    <p class="resumo-avaliacao sem-avaliacao" th:unless="${mediasAvaliacoes[profissional.id] != null}">Ainda sem avaliações</p>
                     <h4>Serviços oferecidos</h4>
                     <ul class="lista-servicos-profissional">
                         <li th:each="servico : ${profissional.servicos}"

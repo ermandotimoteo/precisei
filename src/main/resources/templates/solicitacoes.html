@@ -10,6 +10,7 @@
     <main>
         <section class="cabecalho-pagina"><div><p class="rotulo">Atendimentos</p><h2>Solicitações de serviço</h2><p>Registre atendimentos e acompanhe cada etapa até a conclusão.</p></div><span class="cabecalho-pagina-icone" aria-hidden="true">✓</span></section>
         <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></p>
+        <p class="mensagem erro" role="alert" th:if="${mensagemErro}" th:text="${mensagemErro}"></p>
         <section class="painel-formulario cadastro-principal" aria-labelledby="titulo-nova-solicitacao">
             <h2 id="titulo-nova-solicitacao">Nova solicitação</h2><p>O profissional selecionado deve estar disponível e oferecer o serviço escolhido.</p>
             <form th:action="@{/solicitacoes/novo}" th:object="${solicitacaoForm}" method="post">
@@ -32,6 +33,20 @@
                     <h3 th:text="${solicitacao.servico.nome}">Serviço</h3><p th:text="${solicitacao.descricao}">Descrição</p>
                     <dl><div><dt>Cliente</dt><dd th:text="${solicitacao.cliente.nome}">Cliente</dd></div><div><dt>Profissional</dt><dd th:text="${solicitacao.profissional.nome}">Profissional</dd></div><div><dt>Agendamento</dt><dd th:text="${solicitacao.dataAgendada != null ? #temporals.format(solicitacao.dataAgendada, 'dd/MM/yyyy HH:mm') : 'A combinar'}">Data</dd></div></dl>
                     <div class="acoes-status" th:if="${!solicitacao.proximosStatus.isEmpty()}"><form th:each="proximo : ${solicitacao.proximosStatus}" th:action="@{/solicitacoes/{id}/status(id=${solicitacao.id})}" method="post"><input type="hidden" name="status" th:value="${proximo.name()}"><button class="botao botao-status" type="submit" th:text="|Marcar: ${proximo.descricao}|">Atualizar</button></form></div>
+                    <section class="avaliacao-registrada" th:if="${solicitacao.avaliacao != null}" aria-label="Avaliação registrada">
+                        <strong th:text="|${solicitacao.avaliacao.nota} de 5 estrelas|">5 de 5 estrelas</strong>
+                        <span class="estrelas" aria-hidden="true" th:text="${#strings.repeat('★', solicitacao.avaliacao.nota)}">★★★★★</span>
+                        <p th:if="${solicitacao.avaliacao.comentario != null}" th:text="${solicitacao.avaliacao.comentario}">Comentário</p>
+                    </section>
+                    <form class="formulario-avaliacao" th:if="${solicitacao.avaliavel}" th:action="@{/solicitacoes/{id}/avaliacao(id=${solicitacao.id})}" method="post">
+                        <label th:for="|nota-${solicitacao.id}|">Avaliar atendimento</label>
+                        <select th:id="|nota-${solicitacao.id}|" name="nota" required>
+                            <option value="">Escolha a nota</option><option value="5">5 — Excelente</option><option value="4">4 — Muito bom</option><option value="3">3 — Bom</option><option value="2">2 — Regular</option><option value="1">1 — Ruim</option>
+                        </select>
+                        <label th:for="|comentario-${solicitacao.id}|">Comentário (opcional)</label>
+                        <textarea th:id="|comentario-${solicitacao.id}|" name="comentario" maxlength="1000" rows="2"></textarea>
+                        <button class="botao botao-status" type="submit">Enviar avaliação</button>
+                    </form>
                 </article>
                 <p class="estado-vazio" th:if="${#lists.isEmpty(solicitacoes)}">Nenhuma solicitação cadastrada.</p>
             </div>

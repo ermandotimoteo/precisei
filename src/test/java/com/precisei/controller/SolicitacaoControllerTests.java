@@ -16,11 +16,13 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import com.precisei.dto.SolicitacaoForm;
+import com.precisei.dto.AvaliacaoForm;
 import com.precisei.model.StatusSolicitacao;
 import com.precisei.service.ClienteService;
 import com.precisei.service.ProfissionalService;
 import com.precisei.service.ServicoService;
 import com.precisei.service.SolicitacaoService;
+import com.precisei.service.AvaliacaoService;
 
 @ExtendWith(MockitoExtension.class)
 class SolicitacaoControllerTests {
@@ -29,6 +31,7 @@ class SolicitacaoControllerTests {
     @Mock private ClienteService clienteService;
     @Mock private ProfissionalService profissionalService;
     @Mock private ServicoService servicoService;
+    @Mock private AvaliacaoService avaliacaoService;
     @InjectMocks private SolicitacaoController controller;
 
     @Test
@@ -67,6 +70,18 @@ class SolicitacaoControllerTests {
         assertEquals("redirect:/solicitacoes", controller.alterarStatus(
                 1L, StatusSolicitacao.ACEITA, new RedirectAttributesModelMap()));
         verify(solicitacaoService).alterarStatus(1L, StatusSolicitacao.ACEITA);
+    }
+
+    @Test
+    void deveRegistrarAvaliacaoValida() {
+        AvaliacaoForm form = new AvaliacaoForm();
+        form.setNota((byte) 5);
+        form.setComentario("Excelente atendimento");
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(form, "avaliacaoForm");
+
+        assertEquals("redirect:/solicitacoes", controller.avaliar(1L, form, result,
+                new RedirectAttributesModelMap()));
+        verify(avaliacaoService).cadastrar(1L, form);
     }
 
     private SolicitacaoForm criarForm() {

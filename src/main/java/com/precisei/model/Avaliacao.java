@@ -36,6 +36,14 @@ public class Avaliacao {
     protected Avaliacao() {
     }
 
+    public Avaliacao(byte nota, String comentario, SolicitacaoServico solicitacao) {
+        this.nota = nota;
+        this.comentario = comentario == null || comentario.isBlank()
+                ? null : comentario.trim();
+        this.dataAvaliacao = LocalDateTime.now();
+        this.solicitacao = solicitacao;
+    }
+
     public Long getId() { return id; }
     public byte getNota() { return nota; }
     public String getComentario() { return comentario; }

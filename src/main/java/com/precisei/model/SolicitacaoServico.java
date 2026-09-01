@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -50,6 +51,9 @@ public class SolicitacaoServico {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_servico", nullable = false)
     private Servico servico;
+
+    @OneToOne(mappedBy = "solicitacao")
+    private Avaliacao avaliacao;
 
     protected SolicitacaoServico() {
     }
@@ -92,4 +96,8 @@ public class SolicitacaoServico {
     public Cliente getCliente() { return cliente; }
     public Profissional getProfissional() { return profissional; }
     public Servico getServico() { return servico; }
+    public Avaliacao getAvaliacao() { return avaliacao; }
+    public boolean isAvaliavel() {
+        return status == StatusSolicitacao.CONCLUIDA && avaliacao == null;
+    }
 }

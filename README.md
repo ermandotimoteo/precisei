@@ -52,6 +52,8 @@ O público-alvo conceitual é formado por:
 - validação da disponibilidade do profissional e dos serviços que ele oferece;
 - listagem e acompanhamento das solicitações;
 - atualização controlada do status entre Pendente, Aceita, Em andamento, Concluída e Cancelada;
+- avaliação de solicitações concluídas com nota de 1 a 5 e comentário opcional;
+- bloqueio de avaliações duplicadas e cálculo da média de cada profissional;
 - testes unitários e de integração.
 
 Categorias iniciais:
@@ -71,7 +73,7 @@ Ainda não foram implementados pela interface:
 
 - autenticação de usuários;
 - pesquisa de profissionais por localização e disponibilidade;
-- avaliações de profissionais.
+- recuperação de senha e gerenciamento de sessão.
 
 Essas funcionalidades estão previstas para etapas futuras do projeto.
 
@@ -231,6 +233,7 @@ Para interromper a execução, pressione `Ctrl + C`.
 | GET | `/solicitacoes` | Lista solicitações e apresenta o formulário de criação |
 | POST | `/solicitacoes/novo` | Valida e cria uma solicitação |
 | POST | `/solicitacoes/{id}/status` | Atualiza o status conforme as transições permitidas |
+| POST | `/solicitacoes/{id}/avaliacao` | Avalia uma solicitação concluída |
 
 ## Como executar os testes
 
@@ -240,7 +243,7 @@ Com o MySQL iniciado e a variável `DB_PASSWORD` configurada, execute:
 .\mvnw.cmd test
 ```
 
-Na última validação foram executados **33 testes**, sem falhas ou erros.
+Na última validação foram executados **37 testes**, sem falhas ou erros.
 
 ## Responsividade e acessibilidade
 
@@ -260,7 +263,7 @@ Também foram aplicados:
 
 - permitir filtros por categoria, localização e disponibilidade;
 - adicionar autenticação em uma etapa posterior;
-- implementar avaliações para solicitações concluídas.
+- criar recuperação de senha e gerenciamento de sessão.
 
 ## Contexto acadêmico
 

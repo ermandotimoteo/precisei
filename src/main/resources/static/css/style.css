@@ -858,6 +858,36 @@ main {
     margin-top: 20px;
 }
 
+.formulario-avaliacao,
+.avaliacao-registrada {
+    display: grid;
+    gap: .65rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--borda);
+}
+
+.formulario-avaliacao select,
+.formulario-avaliacao textarea {
+    width: 100%;
+}
+
+.estrelas {
+    color: #f5a000;
+    letter-spacing: .08em;
+}
+
+.resumo-avaliacao {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin: .75rem 0;
+}
+
+.resumo-avaliacao.sem-avaliacao {
+    color: var(--texto-suave);
+}
+
 .botao-status {
     min-height: 36px;
     padding: 8px 12px;
@@ -894,6 +924,12 @@ main {
     border: 1px solid #8ad0a0;
     background-color: #eaf8ee;
     color: #176535;
+}
+
+.mensagem.erro {
+    color: #8b1e2d;
+    background: #fff1f3;
+    border-color: #f2b8c1;
 }
 
 .rodape-site {

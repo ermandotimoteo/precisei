@@ -12,7 +12,7 @@
         <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></p>
         <div class="layout-cadastro-lista">
             <section class="painel-formulario" aria-labelledby="titulo-novo-cliente">
-                <h2 id="titulo-novo-cliente">Novo cliente</h2><p>A senha será armazenada somente como hash BCrypt.</p>
+                <h2 id="titulo-novo-cliente">Novo cliente</h2>
                 <form th:action="@{/clientes/novo}" th:object="${clienteForm}" method="post">
                     <div class="campo"><label for="cliente-nome">Nome</label><input id="cliente-nome" th:field="*{nome}" maxlength="120"><p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p></div>
                     <div class="campo"><label for="cliente-telefone">Telefone</label><input id="cliente-telefone" th:field="*{telefone}" maxlength="20"><p class="erro" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></p></div>

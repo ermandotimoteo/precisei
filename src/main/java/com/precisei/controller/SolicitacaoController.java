@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.precisei.dto.SolicitacaoForm;
+import com.precisei.dto.AvaliacaoForm;
 import com.precisei.model.StatusSolicitacao;
 import com.precisei.service.ClienteService;
 import com.precisei.service.ProfissionalService;
 import com.precisei.service.ServicoService;
 import com.precisei.service.SolicitacaoService;
+import com.precisei.service.AvaliacaoService;
 
 import jakarta.validation.Valid;
 
@@ -26,14 +28,16 @@ public class SolicitacaoController {
     private final ClienteService clienteService;
     private final ProfissionalService profissionalService;
     private final ServicoService servicoService;
+    private final AvaliacaoService avaliacaoService;
 
     public SolicitacaoController(SolicitacaoService solicitacaoService,
             ClienteService clienteService, ProfissionalService profissionalService,
-            ServicoService servicoService) {
+            ServicoService servicoService, AvaliacaoService avaliacaoService) {
         this.solicitacaoService = solicitacaoService;
         this.clienteService = clienteService;
         this.profissionalService = profissionalService;
         this.servicoService = servicoService;
+        this.avaliacaoService = avaliacaoService;
     }
 
     @GetMapping("/solicitacoes")
@@ -74,11 +78,31 @@ public class SolicitacaoController {
         return "redirect:/solicitacoes";
     }
 
+    @PostMapping("/solicitacoes/{id}/avaliacao")
+    public String avaliar(@PathVariable Long id,
+            @Valid @ModelAttribute("avaliacaoForm") AvaliacaoForm form,
+            BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("mensagemErro",
+                    "Escolha uma nota entre 1 e 5 e revise o comentário.");
+            return "redirect:/solicitacoes";
+        }
+        try {
+            avaliacaoService.cadastrar(id, form);
+            redirectAttributes.addFlashAttribute("mensagemSucesso",
+                    "Avaliação registrada com sucesso.");
+        } catch (org.springframework.web.server.ResponseStatusException ex) {
+            redirectAttributes.addFlashAttribute("mensagemErro", ex.getReason());
+        }
+        return "redirect:/solicitacoes";
+    }
+
     private void prepararPagina(Model model, SolicitacaoForm form) {
         model.addAttribute("solicitacoes", solicitacaoService.listarTodas());
         model.addAttribute("clientes", clienteService.listarTodos());
         model.addAttribute("profissionais", profissionalService.listarTodos());
         model.addAttribute("servicos", servicoService.listarTodos());
         model.addAttribute("solicitacaoForm", form);
+        model.addAttribute("avaliacaoForm", new AvaliacaoForm());
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.precisei.dto.ProfissionalForm;
 import com.precisei.service.ProfissionalService;
 import com.precisei.service.ServicoService;
+import com.precisei.service.AvaliacaoService;
 
 import jakarta.validation.Valid;
 
@@ -20,11 +21,13 @@ public class ProfissionalController {
 
     private final ProfissionalService profissionalService;
     private final ServicoService servicoService;
+    private final AvaliacaoService avaliacaoService;
 
     public ProfissionalController(ProfissionalService profissionalService,
-            ServicoService servicoService) {
+            ServicoService servicoService, AvaliacaoService avaliacaoService) {
         this.profissionalService = profissionalService;
         this.servicoService = servicoService;
+        this.avaliacaoService = avaliacaoService;
     }
 
     @GetMapping("/profissionais")
@@ -32,6 +35,7 @@ public class ProfissionalController {
         model.addAttribute("profissionais", profissionalService.listarTodos());
         model.addAttribute("servicos", servicoService.listarTodos());
         model.addAttribute("profissionalForm", new ProfissionalForm());
+        adicionarAvaliacoes(model);
         return "profissionais";
     }
 
@@ -97,5 +101,11 @@ public class ProfissionalController {
         model.addAttribute("profissionais", profissionalService.listarTodos());
         model.addAttribute("servicos", servicoService.listarTodos());
         model.addAttribute("profissionalForm", form);
+        adicionarAvaliacoes(model);
+    }
+
+    private void adicionarAvaliacoes(Model model) {
+        model.addAttribute("mediasAvaliacoes", avaliacaoService.mediasPorProfissional());
+        model.addAttribute("quantidadesAvaliacoes", avaliacaoService.quantidadesPorProfissional());
     }
 }

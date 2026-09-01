@@ -22,6 +22,7 @@ import com.precisei.dto.ProfissionalForm;
 import com.precisei.model.Profissional;
 import com.precisei.service.ProfissionalService;
 import com.precisei.service.ServicoService;
+import com.precisei.service.AvaliacaoService;
 
 @ExtendWith(MockitoExtension.class)
 class ProfissionalControllerTests {
@@ -31,6 +32,9 @@ class ProfissionalControllerTests {
 
     @Mock
     private ServicoService servicoService;
+
+    @Mock
+    private AvaliacaoService avaliacaoService;
 
     @InjectMocks
     private ProfissionalController profissionalController;
