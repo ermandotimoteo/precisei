@@ -44,6 +44,9 @@ O público-alvo conceitual é formado por:
 - catálogo de serviços carregado do MySQL;
 - listagem de profissionais, localização, disponibilidade e serviços oferecidos;
 - mapeamento JPA de todas as entidades e relacionamentos do DER;
+- cadastro e edição de serviços com categoria e preço de referência;
+- cadastro e edição de profissionais com associação a vários serviços;
+- armazenamento de novas senhas profissionais com hash BCrypt;
 - testes unitários e de integração.
 
 Categorias iniciais:
@@ -61,7 +64,6 @@ Esta versão representa uma **solução inicial dinâmica para o Módulo 2**, e 
 
 Ainda não foram implementados pela interface:
 
-- cadastro e edição de perfis de profissionais e serviços;
 - cadastro e autenticação de usuários;
 - pesquisa de profissionais por localização e disponibilidade;
 - solicitação de atendimento;
@@ -214,7 +216,13 @@ Para interromper a execução, pressione `Ctrl + C`.
 | GET | `/` | Exibe a página inicial e as categorias |
 | GET | `/servicos` | Lista categorias e apresenta o formulário |
 | POST | `/servicos` | Valida e cadastra uma categoria |
-| GET | `/profissionais` | Exibe a solução inicial do módulo de profissionais |
+| POST | `/servicos/novo` | Valida e cadastra um serviço |
+| GET | `/servicos/{id}/editar` | Exibe o formulário de edição do serviço |
+| POST | `/servicos/{id}/editar` | Atualiza um serviço |
+| GET | `/profissionais` | Lista profissionais e apresenta o formulário de cadastro |
+| POST | `/profissionais/novo` | Valida e cadastra um profissional |
+| GET | `/profissionais/{id}/editar` | Exibe o formulário de edição do profissional |
+| POST | `/profissionais/{id}/editar` | Atualiza um profissional |
 
 ## Como executar os testes
 
@@ -224,7 +232,7 @@ Com o MySQL iniciado e a variável `DB_PASSWORD` configurada, execute:
 .\mvnw.cmd test
 ```
 
-Na última validação foram executados **16 testes**, sem falhas ou erros.
+Na última validação foram executados **22 testes**, sem falhas ou erros.
 
 ## Responsividade e acessibilidade
 
@@ -242,9 +250,7 @@ Também foram aplicados:
 
 ## Próximas etapas
 
-- implementar formulários de cadastro e edição para serviços e profissionais;
 - implementar os perfis reais de profissionais;
-- relacionar profissionais aos serviços oferecidos;
 - permitir filtros por categoria, localização e disponibilidade;
 - implementar solicitações e atualização de status;
 - adicionar autenticação em uma etapa posterior;

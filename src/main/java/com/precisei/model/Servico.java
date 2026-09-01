@@ -45,6 +45,19 @@ public class Servico {
     protected Servico() {
     }
 
+    public Servico(String nome, String descricao, BigDecimal precoReferencia,
+            Categoria categoria) {
+        atualizar(nome, descricao, precoReferencia, categoria);
+    }
+
+    public void atualizar(String nome, String descricao, BigDecimal precoReferencia,
+            Categoria categoria) {
+        this.nome = nome.trim();
+        this.descricao = descricao.trim();
+        this.precoReferencia = precoReferencia;
+        this.categoria = categoria;
+    }
+
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getDescricao() { return descricao; }

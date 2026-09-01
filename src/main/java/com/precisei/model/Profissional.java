@@ -58,6 +58,30 @@ public class Profissional {
     protected Profissional() {
     }
 
+    public Profissional(String nome, String telefone, String email, String senhaHash,
+            String descricao, String cidade, String bairro, boolean disponivel,
+            Set<Servico> servicos) {
+        this.senhaHash = senhaHash;
+        atualizar(nome, telefone, email, descricao, cidade, bairro, disponivel, servicos);
+    }
+
+    public void atualizar(String nome, String telefone, String email, String descricao,
+            String cidade, String bairro, boolean disponivel, Set<Servico> servicos) {
+        this.nome = nome.trim();
+        this.telefone = telefone.trim();
+        this.email = email.trim().toLowerCase();
+        this.descricao = descricao == null ? null : descricao.trim();
+        this.cidade = cidade.trim();
+        this.bairro = bairro.trim();
+        this.disponivel = disponivel;
+        this.servicos.clear();
+        this.servicos.addAll(servicos);
+    }
+
+    public void alterarSenha(String senhaHash) {
+        this.senhaHash = senhaHash;
+    }
+
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getTelefone() { return telefone; }

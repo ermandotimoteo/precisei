@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import com.precisei.model.Categoria;
+import com.precisei.dto.ServicoForm;
 import com.precisei.service.CategoriaService;
 import com.precisei.service.ServicoService;
 
@@ -80,5 +81,43 @@ class ServicoControllerTests {
         assertEquals("Categoria cadastrada com sucesso.",
                 redirectAttributes.getFlashAttributes().get("mensagemSucesso"));
         verify(categoriaService).cadastrar(categoria);
+    }
+
+    @Test
+    void deveCadastrarServicoValido() {
+        ServicoForm form = criarServicoForm();
+        BeanPropertyBindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "servicoForm");
+
+        String view = servicoController.cadastrarServico(
+                form, bindingResult, new ExtendedModelMap(),
+                new RedirectAttributesModelMap());
+
+        assertEquals("redirect:/servicos", view);
+        verify(servicoService).salvar(form);
+    }
+
+    @Test
+    void deveRejeitarServicoDuplicadoNaCategoria() {
+        ServicoForm form = criarServicoForm();
+        BeanPropertyBindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "servicoForm");
+        when(servicoService.existeDuplicado(form)).thenReturn(true);
+
+        String view = servicoController.cadastrarServico(
+                form, bindingResult, new ExtendedModelMap(),
+                new RedirectAttributesModelMap());
+
+        assertEquals("servicos", view);
+        assertTrue(bindingResult.hasFieldErrors("nome"));
+        verify(servicoService, never()).salvar(form);
+    }
+
+    private ServicoForm criarServicoForm() {
+        ServicoForm form = new ServicoForm();
+        form.setNome("Troca de fechadura");
+        form.setDescricao("Troca de fechadura residencial.");
+        form.setCategoriaId(1L);
+        return form;
     }
 }

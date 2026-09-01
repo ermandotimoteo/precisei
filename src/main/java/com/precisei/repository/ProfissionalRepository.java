@@ -11,4 +11,8 @@ public interface ProfissionalRepository extends JpaRepository<Profissional, Long
 
     @EntityGraph(attributePaths = {"servicos", "servicos.categoria"})
     List<Profissional> findDistinctByOrderByNomeAsc();
+
+    boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
 }

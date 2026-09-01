@@ -11,4 +11,9 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
 
     @EntityGraph(attributePaths = "categoria")
     List<Servico> findAllByOrderByNomeAsc();
+
+    boolean existsByNomeIgnoreCaseAndCategoriaId(String nome, Long categoriaId);
+
+    boolean existsByNomeIgnoreCaseAndCategoriaIdAndIdNot(
+            String nome, Long categoriaId, Long id);
 }

@@ -53,11 +53,53 @@
                         A partir de
                         <strong th:text="${#numbers.formatCurrency(servico.precoReferencia)}">R$ 0,00</strong>
                     </p>
+                    <a class="link-editar" th:href="@{/servicos/{id}/editar(id=${servico.id})}">
+                        Editar serviço
+                    </a>
                 </article>
                 <p class="estado-vazio" th:if="${#lists.isEmpty(servicos)}">
                     Nenhum serviço foi cadastrado ainda.
                 </p>
             </div>
+        </section>
+
+        <section class="painel-formulario cadastro-principal" aria-labelledby="titulo-cadastro-servico">
+            <h2 id="titulo-cadastro-servico">Cadastrar serviço</h2>
+            <p>Inclua um serviço no catálogo e relacione-o a uma categoria.</p>
+            <form th:action="@{/servicos/novo}" th:object="${servicoForm}" method="post">
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="servico-nome">Nome</label>
+                        <input id="servico-nome" type="text" th:field="*{nome}" maxlength="100">
+                        <p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+                    </div>
+                    <div class="campo">
+                        <label for="servico-categoria">Categoria</label>
+                        <select id="servico-categoria" th:field="*{categoriaId}">
+                            <option value="">Selecione</option>
+                            <option th:each="categoria : ${categorias}" th:value="${categoria.id}"
+                                th:text="${categoria.nome}"></option>
+                        </select>
+                        <p class="erro" th:if="${#fields.hasErrors('categoriaId')}"
+                            th:errors="*{categoriaId}"></p>
+                    </div>
+                    <div class="campo">
+                        <label for="servico-preco">Preço de referência</label>
+                        <input id="servico-preco" type="number" th:field="*{precoReferencia}"
+                            min="0" step="0.01">
+                        <p class="erro" th:if="${#fields.hasErrors('precoReferencia')}"
+                            th:errors="*{precoReferencia}"></p>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label for="servico-descricao">Descrição</label>
+                        <textarea id="servico-descricao" th:field="*{descricao}" maxlength="500"
+                            rows="3"></textarea>
+                        <p class="erro" th:if="${#fields.hasErrors('descricao')}"
+                            th:errors="*{descricao}"></p>
+                    </div>
+                </div>
+                <button class="botao" type="submit">Cadastrar serviço</button>
+            </form>
         </section>
 
         <div class="conteudo-servicos">
