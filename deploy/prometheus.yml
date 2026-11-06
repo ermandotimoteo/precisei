@@ -1,0 +1,10 @@
+# Colete apenas na rede privada. Não publicar Prometheus/gestão na internet.
+global:
+  scrape_interval: 30s
+rule_files: [alerts.yml]
+scrape_configs:
+  - job_name: precisei
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['app:9090']
+# Alertmanager/canal e armazenamento devem ser configurados pelo operador.

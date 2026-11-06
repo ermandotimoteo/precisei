@@ -1,0 +1,58 @@
+name: Piloto de carga
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  load:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    services:
+      mysql:
+        image: mysql:8.0.46
+        env: {MYSQL_ROOT_PASSWORD: load-temporary-only}
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pload-temporary-only"
+          --health-interval=5s --health-timeout=5s --health-retries=24
+    env:
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_USER: root
+      MYSQL_PWD: load-temporary-only
+      DB_URL: jdbc:mysql://127.0.0.1:3306/precisei_load_test
+      DB_USERNAME: root
+      DB_PASSWORD: load-temporary-only
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - run: bash mvnw -B -DskipTests package
+      - name: Preparar aplicação e massa sintética
+        run: |
+          mkdir -p artifacts/load
+          mysql -h 127.0.0.1 -uroot -e 'CREATE DATABASE precisei_load_test;'
+          java -jar target/precisei-0.0.1-SNAPSHOT.jar > artifacts/load/app.log 2>&1 &
+          echo $! > artifacts/load/app.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness
+          python3 scripts/seed-load.py --database precisei_load_test
+      - name: Três repetições de 1, 5 e 10 usuários
+        run: |
+          docker pull grafana/k6:2.3.0
+          scanner="$(docker image inspect --format '{{index .RepoDigests 0}}' grafana/k6:2.3.0)"
+          printf '%s\n' "$scanner" > artifacts/load/k6-image.txt
+          { uname -a; lscpu; free -m; } > artifacts/load/environment.txt
+          pid="$(cat artifacts/load/app.pid)"
+          (while kill -0 "$pid" 2>/dev/null; do date -u +%FT%TZ; ps -p "$pid" -o pid,%cpu,rss; sleep 5; done) > artifacts/load/resources.log &
+          chmod 0777 artifacts/load
+          status=0
+          for repetition in 1 2 3; do
+            docker run --rm --network host -v "$PWD/tests/load:/tests:ro" -v "$PWD/artifacts/load:/out" "$scanner" \
+              run --summary-export "/out/run-$repetition.json" /tests/catalogo.js || status=1
+          done
+          exit "$status"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with: {name: load-pilot, path: artifacts/load/, retention-days: 30}

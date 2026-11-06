@@ -1,0 +1,75 @@
+name: precisei
+services:
+  app:
+    image: ${IMAGE:?Informe a imagem aprovada por digest}
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    pids_limit: 160
+    ports: ["127.0.0.1:${APP_PORT:-8080}:8080", "127.0.0.1:${MANAGEMENT_PORT:-9090}:9090"]
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: ${DB_URL:?}
+      DB_USERNAME: ${DB_USERNAME:?}
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?}
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+    networks: [web]
+  proxy:
+    image: ${CADDY_IMAGE:?Fixe a imagem do proxy por digest}
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [web]
+  migrate:
+    profiles: [ops]
+    image: ${IMAGE:?}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      SPRING_PROFILES_ACTIVE: migrate
+      DB_URL: ${DB_URL:?}
+      DB_USERNAME: ${DB_MIGRATION_USERNAME:?}
+      DB_PASSWORD: ${DB_MIGRATION_PASSWORD:?}
+      DB_SCHEMA_LINEAGE: ${DB_SCHEMA_LINEAGE:-production}
+    networks: [web]
+  backup:
+    profiles: [ops]
+    image: ${MYSQL_CLIENT_IMAGE:?Fixe a imagem MySQL por digest}
+    entrypoint: [mysqldump]
+    command: ["--host=${DB_HOST:?}", "--port=${DB_PORT:-3306}", "--user=${DB_BACKUP_USERNAME:?}", "--single-transaction", "--no-tablespaces", "--set-gtid-purged=OFF", "${DB_NAME:?}"]
+    environment:
+      MYSQL_PWD: ${DB_BACKUP_PASSWORD:?}
+    networks: [web]
+  query:
+    profiles: [ops]
+    image: ${MYSQL_CLIENT_IMAGE:?}
+    entrypoint: [mysql]
+    command: ["--host=${DB_HOST:?}", "--port=${DB_PORT:-3306}", "--user=${DB_USERNAME:?}", "--batch", "--skip-column-names", "${DB_NAME:?}"]
+    environment:
+      MYSQL_PWD: ${DB_PASSWORD:?}
+    networks: [web]
+  restore:
+    profiles: [ops]
+    image: ${MYSQL_CLIENT_IMAGE:?}
+    entrypoint: [mysql]
+    command: ["--host=${DB_HOST:?}", "--port=${DB_PORT:-3306}", "--user=${DB_MIGRATION_USERNAME:?}", "--batch", "--skip-column-names", "${RESTORE_DATABASE:-precisei_restore_test}"]
+    environment:
+      MYSQL_PWD: ${DB_MIGRATION_PASSWORD:?}
+    networks: [web]
+networks:
+  web:
+volumes:
+  caddy_data:
+  caddy_config:

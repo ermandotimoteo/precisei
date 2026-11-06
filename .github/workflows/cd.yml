@@ -1,0 +1,78 @@
+name: CD
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main, modulo-3]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: ID da execução CI aprovada que publicou o candidato
+        required: true
+      environment:
+        description: Ambiente de destino (produção exige aprovador configurado)
+        type: choice
+        options: [staging, production]
+        default: staging
+      staging_run_id:
+        description: Execução CD bem-sucedida em homologação deste candidato (obrigatória em produção)
+        required: false
+permissions: {contents: read, actions: read}
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - name: Validar origem da execução e proteção de produção
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+          DEPLOY_ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
+          STAGING_RUN_ID: ${{ github.event.inputs.staging_run_id }}
+        run: |
+          python3 scripts/validate-ci-run.py
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-${{ env.CANDIDATE_SHA }}
+          run-id: ${{ env.CANDIDATE_RUN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: candidate
+      - name: Obter evidência da homologação
+        if: github.event.inputs.environment == 'production'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: staging-${{ env.CANDIDATE_RUN }}-${{ env.CANDIDATE_SHA }}
+          run-id: ${{ github.event.inputs.staging_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: staged
+      - name: Conferir manifesto
+        env:
+          ALLOWED_IMAGE_REPOSITORY: ghcr.io/${{ github.repository }}
+        run: |
+          python3 scripts/ops.py image candidate/release.json
+          test "$(python3 scripts/ops.py commit candidate/release.json)" = "$CANDIDATE_SHA"
+      - name: Conferir que o digest foi homologado
+        if: github.event.inputs.environment == 'production'
+        run: python3 scripts/ops.py same staged/release.json candidate/release.json
+      - name: Solicitar implantação ao comando restrito do servidor
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: bash scripts/request-deploy.sh candidate/release.json
+      - name: Registrar homologação aprovada
+        if: (github.event.inputs.environment || 'staging') == 'staging'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: staging-${{ env.CANDIDATE_RUN }}-${{ env.CANDIDATE_SHA }}
+          path: candidate/release.json
+          retention-days: 30

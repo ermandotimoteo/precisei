@@ -1,0 +1,39 @@
+name: Qualidade periódica
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - run: bash mvnw -B -DskipTests package
+      - name: Reanalisar componentes sem publicar nem implantar
+        run: |
+          mkdir -p artifacts
+          docker pull aquasec/trivy:0.76.2
+          scanner="$(docker image inspect --format '{{index .RepoDigests 0}}' aquasec/trivy:0.76.2)"
+          printf '%s\n' "$scanner" > artifacts/scanner-image.txt
+          docker run --rm -v "$PWD/target/classes/META-INF/sbom:/sbom:ro" -v "$PWD/artifacts:/out" "$scanner" sbom \
+            --severity HIGH,CRITICAL --exit-code 1 --format json --output /out/trivy-periodic.json /sbom/application.cdx.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with: {name: components-periodic, path: artifacts/, retention-days: 30}
+  mutation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - run: bash mvnw -B -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with: {name: mutation-report, path: target/pit-reports/, retention-days: 30}

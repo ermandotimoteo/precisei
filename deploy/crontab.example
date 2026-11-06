@@ -1,0 +1,4 @@
+# Instalar para a conta operacional somente após verificar runtime.env e chaves.
+# Saída de erro deve ser encaminhada ao canal configurado pelo responsável.
+0 2 * * * DEPLOY_ROOT=/srv/precisei bash /srv/precisei/scripts/backup.sh
+*/5 * * * * DEPLOY_ROOT=/srv/precisei bash /srv/precisei/scripts/monitor.sh

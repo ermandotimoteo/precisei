@@ -1,0 +1,17 @@
+{
+  "name": "precisei-quality",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "check": "node scripts/check-project.mjs",
+    "test:e2e": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "release:manifest": "node scripts/release-manifest.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.62.1",
+    "yaml": "2.9.1"
+  }
+}

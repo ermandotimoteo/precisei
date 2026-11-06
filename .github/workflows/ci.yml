@@ -1,0 +1,159 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main, modulo-3, 'codex/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    services:
+      mysql:
+        image: mysql:8.0.46
+        env:
+          MYSQL_ROOT_PASSWORD: ci-temporary-only
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pci-temporary-only"
+          --health-interval=5s --health-timeout=5s --health-retries=24
+    env:
+      TEST_DB_URL: jdbc:mysql://127.0.0.1:3306/precisei_test
+      TEST_PROD_DB_URL: jdbc:mysql://127.0.0.1:3306/precisei_production_test
+      TEST_DB_USERNAME: root
+      TEST_DB_PASSWORD: ci-temporary-only
+      TEST_DB_DRIVER: com.mysql.cj.jdbc.Driver
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with: {node-version: '24'}
+      - name: Ferramentas de qualidade fixadas
+        run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: python3 -m unittest discover -s tests/ops -v
+      - name: Verificar sintaxe dos procedimentos operacionais
+        run: for script in scripts/*.sh; do bash -n "$script"; done
+      - name: Bancos efêmeros exclusivos
+        env: {MYSQL_PWD: ci-temporary-only}
+        run: |
+          mysql -h 127.0.0.1 -uroot -e 'CREATE DATABASE precisei_test; CREATE DATABASE precisei_production_test;'
+      - name: Unidade, integração, concorrência, bootstrap e cobertura
+        run: bash mvnw -B -Pstatic verify
+      - name: Retestar restrições SQL reais
+        env: {MYSQL_HOST: 127.0.0.1, MYSQL_USER: root, MYSQL_PWD: ci-temporary-only}
+        run: python3 tests/database/constraints.py --database precisei_test
+      - name: Imagem candidata (sem publicação)
+        run: bash scripts/build-image.sh precisei:ci
+      - name: Segurança de dependências e imagem
+        run: |
+          mkdir -p artifacts
+          pnpm audit --audit-level high
+          docker pull aquasec/trivy:0.76.2
+          scanner="$(docker image inspect --format '{{index .RepoDigests 0}}' aquasec/trivy:0.76.2)"
+          printf '%s\n' "$scanner" > artifacts/scanner-image.txt
+          docker run --rm -v "$PWD:/src:ro" -v "$PWD/artifacts:/out" "$scanner" fs \
+            --scanners secret --severity HIGH,CRITICAL --exit-code 1 \
+            --skip-dirs /src/.git --skip-dirs /src/node_modules --skip-dirs /src/target \
+            --format json --output /out/trivy-source.json /src
+          docker run --rm -v "$PWD/target/classes/META-INF/sbom:/sbom:ro" -v "$PWD/artifacts:/out" "$scanner" sbom \
+            --severity HIGH,CRITICAL --exit-code 1 --format json --output /out/trivy-components.json /sbom/application.cdx.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/artifacts:/out" "$scanner" image \
+            --scanners vuln,secret --severity HIGH,CRITICAL --exit-code 1 \
+            --format json --output /out/trivy-image.json precisei:ci
+      - name: Verificar imagem em execução
+        run: |
+          docker run -d --name precisei-e2e --network host \
+            -e SPRING_PROFILES_ACTIVE=dev \
+            -e DB_URL="$TEST_DB_URL" -e DB_USERNAME="$TEST_DB_USERNAME" -e DB_PASSWORD="$TEST_DB_PASSWORD" \
+            -e BCRYPT_STRENGTH=4 precisei:ci
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness
+      - name: Análise dinâmica passiva em ambiente temporário
+        run: |
+          mkdir -p artifacts/zap
+          cp tests/security/zap-rules.tsv artifacts/zap/
+          chmod 0777 artifacts/zap
+          docker pull ghcr.io/zaproxy/zaproxy:2.17.0
+          zap_image="$(docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/zaproxy/zaproxy:2.17.0)"
+          printf '%s\n' "$zap_image" > artifacts/zap-image.txt
+          docker run --rm --network host -v "$PWD/artifacts/zap:/zap/wrk:rw" "$zap_image" \
+            zap-baseline.py -t http://127.0.0.1:8080 -c zap-rules.tsv -m 1 -I -J report.json -r report.html
+      - run: pnpm exec playwright install --with-deps chromium firefox
+      - run: pnpm test:e2e
+      - name: Gerar manifesto sem publicação
+        run: |
+          export TESTED_IMAGE_ID="$(docker image inspect precisei:ci --format '{{.Id}}')"
+          pnpm release:manifest
+          docker save precisei:ci -o artifacts/candidate-image.tar
+      - name: Evidências (inclusive falhas)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: quality-${{ github.sha }}
+          retention-days: 30
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/
+            target/classes/META-INF/sbom/
+            target/spotbugsXml.xml
+            target/precisei-0.0.1-SNAPSHOT.jar
+            test-results/
+            playwright-report/
+            artifacts/
+      - name: Logs sanitizados do contêiner
+        if: failure()
+        run: docker logs precisei-e2e --tail 100 || true
+  publish:
+    needs: quality
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/modulo-3')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions: {contents: read, packages: write, actions: read}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {name: 'quality-${{ github.sha }}', path: candidate}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with: {node-version: '24'}
+      - name: Publicar exatamente a imagem testada
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+        run: |
+          # O arquivo OCI é produzido pelo mesmo job que rodou o E2E.
+          test -f candidate/artifacts/candidate-image.tar
+          docker load -i candidate/artifacts/candidate-image.tar
+          expected_id="$(node -p "JSON.parse(require('fs').readFileSync('candidate/artifacts/release.json')).testedImageId")"
+          test "$expected_id" = "$(docker image inspect precisei:ci --format '{{.Id}}')"
+          expected_jar="$(node -p "JSON.parse(require('fs').readFileSync('candidate/artifacts/release.json')).jarSha256")"
+          printf '%s  %s\n' "$expected_jar" candidate/target/precisei-0.0.1-SNAPSHOT.jar | sha256sum --check
+          repository="ghcr.io/${GITHUB_REPOSITORY,,}"
+          printf '%s' "$REGISTRY_TOKEN" | docker login ghcr.io -u "$REGISTRY_USER" --password-stdin
+          docker tag precisei:ci "$repository:sha-$GITHUB_SHA"
+          docker push "$repository:sha-$GITHUB_SHA"
+          export IMAGE_REPOSITORY="$repository"
+          export IMAGE_DIGEST="$(docker image inspect "$repository:sha-$GITHUB_SHA" --format '{{index .RepoDigests 0}}' | sed 's/.*@//')"
+          mkdir -p target
+          cp candidate/target/precisei-0.0.1-SNAPSHOT.jar target/
+          export RESOLVED_JAVA_RUNTIME="$(cat candidate/artifacts/java-runtime.txt)"
+          export TESTED_IMAGE_ID="$expected_id"
+          node scripts/release-manifest.mjs
+          docker logout ghcr.io
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-${{ github.sha }}
+          path: artifacts/
+          retention-days: 30

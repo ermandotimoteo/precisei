@@ -1,0 +1,20 @@
+name: Defeito
+description: Registro verificável de erro, segurança ou teste instável
+body:
+  - type: textarea
+    id: evidencia
+    attributes:
+      label: Caso, commit, ambiente e passos de reprodução
+      description: Não incluir senhas, tokens ou dados pessoais reais.
+    validations: {required: true}
+  - type: textarea
+    id: resultado
+    attributes:
+      label: Resultado esperado, observado e evidências sanitizadas
+    validations: {required: true}
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade proposta
+      options: [P0 crítica, P1 alta, P2 média, P3 baixa]
+    validations: {required: true}

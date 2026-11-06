@@ -35,3 +35,21 @@ build/
 # Documentação enviada separadamente
 relatorio-assets/
 Relatorio_Modulo_2_Precisei.docx
+
+# Segredos, ferramentas e evidências locais
+.env
+.env.*
+!.env.example
+!.env.test.example
+node_modules/
+playwright-report/
+test-results/
+artifacts/
+backups/
+*.pem
+*.key
+*.dump
+*.sql.gz
+.DS_Store
+__pycache__/
+*.pyc
