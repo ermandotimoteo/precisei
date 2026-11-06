@@ -20,6 +20,7 @@ public class ServicoForm {
     private String descricao;
 
     @DecimalMin(value = "0.00", message = "O preço não pode ser negativo.")
+    @jakarta.validation.constraints.Digits(integer = 8, fraction = 2, message = "Use até 8 dígitos inteiros e 2 casas decimais.")
     private BigDecimal precoReferencia;
 
     @NotNull(message = "Selecione uma categoria.")

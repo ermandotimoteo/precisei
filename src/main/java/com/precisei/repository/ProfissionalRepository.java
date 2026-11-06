@@ -14,6 +14,7 @@ public interface ProfissionalRepository extends JpaRepository<Profissional, Long
     List<Profissional> findDistinctByOrderByNomeAsc();
 
     boolean existsByEmailIgnoreCase(String email);
+    Optional<Profissional> findByEmailIgnoreCase(String email);
 
     boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
 

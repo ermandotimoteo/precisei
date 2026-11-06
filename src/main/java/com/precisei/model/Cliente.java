@@ -39,6 +39,8 @@ public class Cliente {
     }
 
     public Long getId() { return id; }
+    public String getSenhaHash() { return senhaHash; }
+    public void alterarSenha(String hash) { this.senhaHash = hash; }
     public String getNome() { return nome; }
     public String getTelefone() { return telefone; }
     public String getEmail() { return email; }

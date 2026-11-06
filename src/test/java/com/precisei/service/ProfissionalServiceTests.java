@@ -33,6 +33,8 @@ class ProfissionalServiceTests {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock private com.precisei.security.AcessoService acesso;
+
     @InjectMocks
     private ProfissionalService profissionalService;
 
@@ -62,6 +64,6 @@ class ProfissionalServiceTests {
         profissionalService.salvar(form);
 
         verify(passwordEncoder).encode("senha-segura");
-        verify(profissionalRepository).save(any(Profissional.class));
+        verify(profissionalRepository).saveAndFlush(any(Profissional.class));
     }
 }

@@ -32,10 +32,9 @@ public class ClienteController {
     public String cadastrar(@Valid @ModelAttribute("clienteForm") ClienteForm form,
             BindingResult bindingResult, Model model,
             RedirectAttributes redirectAttributes) {
-        if (form.getSenha() == null || form.getSenha().isBlank()
-                || form.getSenha().length() < 8) {
+        if (!com.precisei.security.PoliticaSenha.valida(form.getSenha())) {
             bindingResult.rejectValue("senha", "senha.invalida",
-                    "Informe uma senha com pelo menos 8 caracteres.");
+                    "Informe uma senha com ao menos 8 caracteres e no máximo 72 bytes.");
         }
         if (!bindingResult.hasFieldErrors("email")
                 && clienteService.existeEmail(form.getEmail())) {
@@ -55,5 +54,11 @@ public class ClienteController {
     private void prepararPagina(Model model, ClienteForm form) {
         model.addAttribute("clientes", clienteService.listarTodos());
         model.addAttribute("clienteForm", form);
+    }
+
+    @GetMapping("/cadastro/cliente")
+    public String cadastro(Model model) {
+        prepararPagina(model, new ClienteForm());
+        return "clientes";
     }
 }

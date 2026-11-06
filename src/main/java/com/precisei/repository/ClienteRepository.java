@@ -8,4 +8,5 @@ import java.util.List;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     List<Cliente> findAllByOrderByNomeAsc();
     boolean existsByEmailIgnoreCase(String email);
+    java.util.Optional<Cliente> findByEmailIgnoreCase(String email);
 }

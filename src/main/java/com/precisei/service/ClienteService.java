@@ -17,16 +17,21 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.precisei.security.AcessoService acesso;
 
     public ClienteService(ClienteRepository clienteRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder, com.precisei.security.AcessoService acesso) {
         this.clienteRepository = clienteRepository;
         this.passwordEncoder = passwordEncoder;
+        this.acesso = acesso;
     }
 
     @Transactional(readOnly = true)
     public List<Cliente> listarTodos() {
-        return clienteRepository.findAllByOrderByNomeAsc();
+        if (acesso.manutencao()) return clienteRepository.findAllByOrderByNomeAsc();
+        var user = acesso.opcional();
+        return user != null && user.tipo() == com.precisei.security.TipoConta.CLIENTE
+                ? clienteRepository.findById(user.id()).map(List::of).orElseGet(List::of) : List.of();
     }
 
     @Transactional(readOnly = true)
@@ -36,9 +41,10 @@ public class ClienteService {
 
     @Transactional
     public Cliente cadastrar(ClienteForm form) {
+        com.precisei.security.PoliticaSenha.exigir(form.getSenha());
         Cliente cliente = new Cliente(form.getNome(), form.getTelefone(), form.getEmail(),
                 passwordEncoder.encode(form.getSenha()));
-        return clienteRepository.save(cliente);
+        return clienteRepository.saveAndFlush(cliente);
     }
 
     @Transactional(readOnly = true)

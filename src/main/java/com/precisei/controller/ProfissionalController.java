@@ -44,6 +44,7 @@ public class ProfissionalController {
             @Valid @ModelAttribute("profissionalForm") ProfissionalForm form,
             BindingResult bindingResult, Model model,
             RedirectAttributes redirectAttributes) {
+        form.setId(null);
         validar(form, bindingResult, true);
         if (bindingResult.hasErrors()) {
             prepararListagem(model, form);
@@ -81,12 +82,11 @@ public class ProfissionalController {
 
     private void validar(ProfissionalForm form, BindingResult bindingResult,
             boolean cadastro) {
-        if (cadastro && (form.getSenha() == null || form.getSenha().isBlank()
-                || form.getSenha().length() < 8)) {
+        if (cadastro && !com.precisei.security.PoliticaSenha.valida(form.getSenha())) {
             bindingResult.rejectValue("senha", "senha.invalida",
-                    "Informe uma senha com pelo menos 8 caracteres.");
+                    "Informe uma senha com ao menos 8 caracteres e no máximo 72 bytes.");
         } else if (!cadastro && form.getSenha() != null
-                && !form.getSenha().isBlank() && form.getSenha().length() < 8) {
+                && !form.getSenha().isBlank() && !com.precisei.security.PoliticaSenha.valida(form.getSenha())) {
             bindingResult.rejectValue("senha", "senha.invalida",
                     "A nova senha deve possuir pelo menos 8 caracteres.");
         }

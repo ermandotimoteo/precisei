@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Entrar - Precisei</title><link rel="stylesheet" th:href="@{/css/style.css}"></head>
+<body>
+<header th:replace="~{fragments/navegacao :: cabecalho('login')}"></header>
+<main id="conteudo" class="pagina-formulario">
+    <section class="painel-formulario formulario-central" aria-labelledby="titulo-login">
+        <h2 id="titulo-login">Entre no Precisei</h2>
+        <p>Escolha seu tipo de conta para acompanhar seus atendimentos.</p>
+        <p th:if="${param.erro}" class="mensagem erro" role="alert">Não foi possível entrar. Confira o tipo de conta, o e-mail e a senha.</p>
+        <p th:if="${param.saiu}" class="mensagem sucesso" role="status">Você saiu da sua conta.</p>
+        <p th:if="${param.expirou}" class="mensagem" role="status">Sua sessão expirou. Entre novamente para continuar.</p>
+        <form th:action="@{/login}" method="post">
+            <div class="campo"><label for="tipo">Tipo de conta</label><select id="tipo" name="tipo" required><option value="CLIENTE">Cliente</option><option value="PROFISSIONAL">Profissional</option><option value="MANUTENCAO">Manutenção</option></select></div>
+            <div class="campo"><label for="username">E-mail</label><input id="username" name="username" type="email" maxlength="160" autocomplete="username" required></div>
+            <div class="campo"><label for="password">Senha</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+            <button class="botao" type="submit">Entrar</button>
+        </form>
+        <p><a th:href="@{/cadastro/cliente}">Cadastrar como cliente</a> · <a th:href="@{/profissionais#titulo-cadastro-profissional}">Cadastrar como profissional</a></p>
+    </section>
+</main>
+<footer th:replace="~{fragments/navegacao :: rodape}"></footer>
+</body></html>

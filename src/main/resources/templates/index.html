@@ -12,24 +12,9 @@
 
 <body>
 
-    <header class="cabecalho-site">
-        <nav aria-label="Navegação principal">
-            <a class="marca" th:href="@{/}" href="/" aria-label="Precisei - Página inicial">
-                <span class="marca-icone" aria-hidden="true">P</span>
-                <h1>Precisei</h1>
-            </a>
+    <header th:replace="~{fragments/navegacao :: cabecalho('inicio')}"></header>
 
-            <ul>
-                <li><a th:href="@{/}" href="/" aria-current="page">Início</a></li>
-                <li><a th:href="@{/profissionais}" href="/profissionais">Profissionais</a></li>
-                <li><a th:href="@{/servicos}" href="/servicos">Serviços</a></li>
-                <li><a th:href="@{/clientes}" href="/clientes">Clientes</a></li>
-                <li><a th:href="@{/solicitacoes}" href="/solicitacoes">Solicitações</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main class="pagina-inicial">
+    <main id="conteudo" class="pagina-inicial">
 
         <section class="hero">
             <div class="hero-conteudo">
@@ -93,13 +78,7 @@
 
     </main>
 
-    <footer class="rodape-site">
-
-        <p>
-            © 2026 Precisei - Projeto Integrador de Tecnologia da Informação II
-        </p>
-
-    </footer>
+    <footer th:replace="~{fragments/navegacao :: rodape}"></footer>
 
 </body>
 

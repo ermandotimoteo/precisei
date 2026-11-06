@@ -9,28 +9,14 @@
 </head>
 
 <body>
-    <header class="cabecalho-site">
-        <nav aria-label="Navegação principal">
-            <a class="marca" th:href="@{/}" href="/" aria-label="Precisei - Página inicial">
-                <span class="marca-icone" aria-hidden="true">P</span>
-                <h1>Precisei</h1>
-            </a>
-            <ul>
-                <li><a th:href="@{/}" href="/">Início</a></li>
-                <li><a th:href="@{/profissionais}" href="/profissionais">Profissionais</a></li>
-                <li><a th:href="@{/servicos}" href="/servicos" aria-current="page">Serviços</a></li>
-                <li><a th:href="@{/clientes}" href="/clientes">Clientes</a></li>
-                <li><a th:href="@{/solicitacoes}" href="/solicitacoes">Solicitações</a></li>
-            </ul>
-        </nav>
-    </header>
+    <header th:replace="~{fragments/navegacao :: cabecalho('servicos')}"></header>
 
-    <main class="pagina-servicos">
+    <main id="conteudo" class="pagina-servicos">
         <section class="cabecalho-pagina" aria-labelledby="titulo-servicos">
             <div>
                 <p class="rotulo">Categorias</p>
                 <h2 id="titulo-servicos">Serviços disponíveis</h2>
-                <p>Consulte os serviços reais e organize as categorias utilizadas no Precisei.</p>
+                <p>Consulte os serviços e combine com o profissional o valor final e o horário do atendimento.</p>
             </div>
             <span class="cabecalho-pagina-icone" aria-hidden="true">✓</span>
         </section>
@@ -52,10 +38,10 @@
                     <h3 th:text="${servico.nome}">Nome do serviço</h3>
                     <p th:text="${servico.descricao}">Descrição do serviço</p>
                     <p class="preco" th:if="${servico.precoReferencia != null}">
-                        A partir de
+                        Preço de referência
                         <strong th:text="${#numbers.formatCurrency(servico.precoReferencia)}">R$ 0,00</strong>
                     </p>
-                    <a class="link-editar" th:href="@{/servicos/{id}/editar(id=${servico.id})}">
+                    <a th:if="${manutencao}" class="link-editar" th:href="@{/servicos/{id}/editar(id=${servico.id})}">
                         Editar serviço
                     </a>
                 </article>
@@ -65,39 +51,40 @@
             </div>
         </section>
 
-        <section class="painel-formulario cadastro-principal" aria-labelledby="titulo-cadastro-servico">
+        <section th:if="${manutencao}" class="painel-formulario cadastro-principal" aria-labelledby="titulo-cadastro-servico">
             <h2 id="titulo-cadastro-servico">Cadastrar serviço</h2>
             <p>Inclua um serviço no catálogo e relacione-o a uma categoria.</p>
             <form th:action="@{/servicos/novo}" th:object="${servicoForm}" method="post">
+<div class="resumo-erros" th:if="${#fields.hasErrors()}" role="alert"><p>Revise os campos indicados:</p><ul><li th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></li></ul></div>
                 <div class="grade-campos">
                     <div class="campo">
                         <label for="servico-nome">Nome</label>
-                        <input id="servico-nome" type="text" th:field="*{nome}" maxlength="100">
-                        <p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+                        <input id="servico-nome" type="text" th:field="*{nome}" maxlength="100" th:attr="aria-invalid=${#fields.hasErrors('nome')},aria-describedby='servico-nome-erro'">
+                        <p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" id="servico-nome-erro"></p>
                     </div>
                     <div class="campo">
                         <label for="servico-categoria">Categoria</label>
-                        <select id="servico-categoria" th:field="*{categoriaId}">
+                        <select id="servico-categoria" th:field="*{categoriaId}" th:attr="aria-invalid=${#fields.hasErrors('categoriaId')},aria-describedby='servico-categoria-erro'">
                             <option value="">Selecione</option>
                             <option th:each="categoria : ${categorias}" th:value="${categoria.id}"
                                 th:text="${categoria.nome}"></option>
                         </select>
                         <p class="erro" th:if="${#fields.hasErrors('categoriaId')}"
-                            th:errors="*{categoriaId}"></p>
+                            th:errors="*{categoriaId}" id="servico-categoria-erro"></p>
                     </div>
                     <div class="campo">
                         <label for="servico-preco">Preço de referência</label>
                         <input id="servico-preco" type="number" th:field="*{precoReferencia}"
-                            min="0" step="0.01">
+                            min="0" step="0.01" th:attr="aria-invalid=${#fields.hasErrors('precoReferencia')},aria-describedby='servico-preco-erro'">
                         <p class="erro" th:if="${#fields.hasErrors('precoReferencia')}"
-                            th:errors="*{precoReferencia}"></p>
+                            th:errors="*{precoReferencia}" id="servico-preco-erro"></p>
                     </div>
                     <div class="campo campo-largo">
                         <label for="servico-descricao">Descrição</label>
                         <textarea id="servico-descricao" th:field="*{descricao}" maxlength="500"
-                            rows="3"></textarea>
+                            rows="3" th:attr="aria-invalid=${#fields.hasErrors('descricao')},aria-describedby='servico-descricao-erro'"></textarea>
                         <p class="erro" th:if="${#fields.hasErrors('descricao')}"
-                            th:errors="*{descricao}"></p>
+                            th:errors="*{descricao}" id="servico-descricao-erro"></p>
                     </div>
                 </div>
                 <button class="botao" type="submit">Cadastrar serviço</button>
@@ -121,11 +108,12 @@
                 </p>
             </section>
 
-            <section class="painel-formulario" aria-labelledby="titulo-cadastro">
+            <section th:if="${manutencao}" class="painel-formulario" aria-labelledby="titulo-cadastro">
                 <h2 id="titulo-cadastro">Cadastrar categoria</h2>
                 <p>Adicione uma categoria simples para organizar os serviços oferecidos.</p>
 
                 <form th:action="@{/servicos}" th:object="${novaCategoria}" method="post">
+<div class="resumo-erros" th:if="${#fields.hasErrors()}" role="alert"><p>Revise os campos indicados:</p><ul><li th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></li></ul></div>
                     <div class="campo">
                         <label for="nome">Nome da categoria</label>
                         <input id="nome" type="text" th:field="*{nome}" maxlength="80"
@@ -141,9 +129,7 @@
         </div>
     </main>
 
-    <footer class="rodape-site">
-        <p>© 2026 Precisei - Projeto Integrador de Tecnologia da Informação II</p>
-    </footer>
+    <footer th:replace="~{fragments/navegacao :: rodape}"></footer>
 </body>
 
 </html>

@@ -28,43 +28,52 @@ class AvaliacaoServiceTests {
     @Mock private AvaliacaoRepository avaliacaoRepository;
     @Mock private SolicitacaoServicoRepository solicitacaoRepository;
     @Mock private SolicitacaoServico solicitacao;
+    @Mock private com.precisei.security.AcessoService acesso;
     @InjectMocks private AvaliacaoService service;
+
+    @org.junit.jupiter.api.BeforeEach
+    void titular() {
+        var cliente = org.mockito.Mockito.mock(com.precisei.model.Cliente.class);
+        org.mockito.Mockito.lenient().when(cliente.getId()).thenReturn(1L);
+        org.mockito.Mockito.lenient().when(solicitacao.getCliente()).thenReturn(cliente);
+        org.mockito.Mockito.lenient().when(acesso.usuario()).thenReturn(new com.precisei.security.UsuarioAutenticado(1L, com.precisei.security.TipoConta.CLIENTE, "Cliente"));
+    }
 
     @Test
     void deveCadastrarAvaliacaoParaSolicitacaoConcluida() {
         AvaliacaoForm form = formulario();
-        when(solicitacaoRepository.findById(1L)).thenReturn(Optional.of(solicitacao));
+        when(solicitacaoRepository.buscarParaAtualizar(1L)).thenReturn(Optional.of(solicitacao));
         when(solicitacao.getStatus()).thenReturn(StatusSolicitacao.CONCLUIDA);
         when(avaliacaoRepository.existsBySolicitacaoId(1L)).thenReturn(false);
-        when(avaliacaoRepository.save(org.mockito.ArgumentMatchers.any(Avaliacao.class)))
+        when(avaliacaoRepository.saveAndFlush(org.mockito.ArgumentMatchers.any(Avaliacao.class)))
                 .thenAnswer(invocacao -> invocacao.getArgument(0));
 
         Avaliacao avaliacao = service.cadastrar(1L, form);
 
         assertEquals(5, avaliacao.getNota());
         assertEquals("Excelente atendimento", avaliacao.getComentario());
-        verify(avaliacaoRepository).save(org.mockito.ArgumentMatchers.any(Avaliacao.class));
+        verify(avaliacaoRepository).saveAndFlush(org.mockito.ArgumentMatchers.any(Avaliacao.class));
     }
 
     @Test
     void deveRejeitarSolicitacaoNaoConcluida() {
-        when(solicitacaoRepository.findById(1L)).thenReturn(Optional.of(solicitacao));
+        when(solicitacaoRepository.buscarParaAtualizar(1L)).thenReturn(Optional.of(solicitacao));
         when(solicitacao.getStatus()).thenReturn(StatusSolicitacao.ACEITA);
 
         assertThrows(ResponseStatusException.class,
                 () -> service.cadastrar(1L, formulario()));
-        verify(avaliacaoRepository, never()).save(org.mockito.ArgumentMatchers.any());
+        verify(avaliacaoRepository, never()).saveAndFlush(org.mockito.ArgumentMatchers.any());
     }
 
     @Test
     void deveRejeitarSegundaAvaliacao() {
-        when(solicitacaoRepository.findById(1L)).thenReturn(Optional.of(solicitacao));
+        when(solicitacaoRepository.buscarParaAtualizar(1L)).thenReturn(Optional.of(solicitacao));
         when(solicitacao.getStatus()).thenReturn(StatusSolicitacao.CONCLUIDA);
         when(avaliacaoRepository.existsBySolicitacaoId(1L)).thenReturn(true);
 
         assertThrows(ResponseStatusException.class,
                 () -> service.cadastrar(1L, formulario()));
-        verify(avaliacaoRepository, never()).save(org.mockito.ArgumentMatchers.any());
+        verify(avaliacaoRepository, never()).saveAndFlush(org.mockito.ArgumentMatchers.any());
     }
 
     private AvaliacaoForm formulario() {

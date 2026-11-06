@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size;
 
 public class SolicitacaoForm {
 
-    @NotNull(message = "Selecione um cliente.")
+    // Preenchido pela sessão; um valor enviado pelo cliente nunca define o titular.
     private Long clienteId;
 
     @NotNull(message = "Selecione um profissional.")

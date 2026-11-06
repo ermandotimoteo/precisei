@@ -9,6 +9,37 @@ import org.junit.jupiter.api.Test;
 
 class SolicitacaoServicoTests {
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.MethodSource("transicoes")
+    void verificaTodasAsSaidasDeCadaEstado(StatusSolicitacao origem, StatusSolicitacao alvo) {
+        var pendente = criarSolicitacao();
+        if (origem == StatusSolicitacao.CANCELADA) pendente.alterarStatus(origem);
+        else if (origem != StatusSolicitacao.PENDENTE) {
+            pendente.alterarStatus(StatusSolicitacao.ACEITA);
+            if (origem != StatusSolicitacao.ACEITA) pendente.alterarStatus(StatusSolicitacao.EM_ANDAMENTO);
+            if (origem == StatusSolicitacao.CONCLUIDA) pendente.alterarStatus(origem);
+        }
+        var permitidos = java.util.Map.of(
+                StatusSolicitacao.PENDENTE, Set.of(StatusSolicitacao.ACEITA, StatusSolicitacao.CANCELADA),
+                StatusSolicitacao.ACEITA, Set.of(StatusSolicitacao.EM_ANDAMENTO, StatusSolicitacao.CANCELADA),
+                StatusSolicitacao.EM_ANDAMENTO, Set.of(StatusSolicitacao.CONCLUIDA, StatusSolicitacao.CANCELADA),
+                StatusSolicitacao.CONCLUIDA, Set.<StatusSolicitacao>of(),
+                StatusSolicitacao.CANCELADA, Set.<StatusSolicitacao>of()).get(origem);
+        assertEquals(permitidos, pendente.getProximosStatus());
+        if (permitidos.contains(alvo)) {
+            pendente.alterarStatus(alvo);assertEquals(alvo,pendente.getStatus());
+        } else {
+            assertThrows(IllegalStateException.class,() -> pendente.alterarStatus(alvo));
+            assertEquals(origem, pendente.getStatus());
+        }
+    }
+
+    static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> transicoes() {
+        return java.util.Arrays.stream(StatusSolicitacao.values()).flatMap(origem ->
+                java.util.Arrays.stream(StatusSolicitacao.values()).map(alvo ->
+                        org.junit.jupiter.params.provider.Arguments.of(origem, alvo)));
+    }
+
     @Test
     void deveRespeitarFluxoDeStatus() {
         SolicitacaoServico solicitacao = criarSolicitacao();

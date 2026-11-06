@@ -83,6 +83,7 @@ public class Profissional {
     }
 
     public Long getId() { return id; }
+    public String getSenhaHash() { return senhaHash; }
     public String getNome() { return nome; }
     public String getTelefone() { return telefone; }
     public String getEmail() { return email; }

@@ -9,23 +9,9 @@
 </head>
 
 <body>
-    <header class="cabecalho-site">
-        <nav aria-label="Navegação principal">
-            <a class="marca" th:href="@{/}" href="/" aria-label="Precisei - Página inicial">
-                <span class="marca-icone" aria-hidden="true">P</span>
-                <h1>Precisei</h1>
-            </a>
-            <ul>
-                <li><a th:href="@{/}" href="/">Início</a></li>
-                <li><a th:href="@{/profissionais}" href="/profissionais" aria-current="page">Profissionais</a></li>
-                <li><a th:href="@{/servicos}" href="/servicos">Serviços</a></li>
-                <li><a th:href="@{/clientes}" href="/clientes">Clientes</a></li>
-                <li><a th:href="@{/solicitacoes}" href="/solicitacoes">Solicitações</a></li>
-            </ul>
-        </nav>
-    </header>
+    <header th:replace="~{fragments/navegacao :: cabecalho('profissionais')}"></header>
 
-    <main class="pagina-profissionais">
+    <main id="conteudo" class="pagina-profissionais">
         <section class="cabecalho-pagina" aria-labelledby="titulo-profissionais">
             <div>
                 <p class="rotulo">Profissionais</p>
@@ -38,18 +24,19 @@
         <p class="mensagem sucesso" role="status" th:if="${mensagemSucesso}"
             th:text="${mensagemSucesso}"></p>
 
-        <section class="painel-formulario cadastro-principal" aria-labelledby="titulo-cadastro-profissional">
+        <section th:if="${usuarioAtual == null}" class="painel-formulario cadastro-principal" aria-labelledby="titulo-cadastro-profissional">
             <h2 id="titulo-cadastro-profissional">Cadastrar profissional</h2>
             <p>Cadastre um perfil e selecione os serviços oferecidos.</p>
             <form th:action="@{/profissionais/novo}" th:object="${profissionalForm}" method="post">
+<div class="resumo-erros" th:if="${#fields.hasErrors()}" role="alert"><p>Revise os campos indicados:</p><ul><li th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></li></ul></div>
                 <div class="grade-campos">
-                    <div class="campo"><label for="prof-nome">Nome</label><input id="prof-nome" th:field="*{nome}" maxlength="120"><p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p></div>
-                    <div class="campo"><label for="prof-email">E-mail</label><input id="prof-email" type="email" th:field="*{email}" maxlength="160"><p class="erro" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p></div>
-                    <div class="campo"><label for="prof-telefone">Telefone</label><input id="prof-telefone" th:field="*{telefone}" maxlength="20"><p class="erro" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></p></div>
-                    <div class="campo"><label for="prof-senha">Senha inicial</label><input id="prof-senha" type="password" th:field="*{senha}" minlength="8" autocomplete="new-password"><p class="erro" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p></div>
-                    <div class="campo"><label for="prof-cidade">Cidade</label><input id="prof-cidade" th:field="*{cidade}" maxlength="100"><p class="erro" th:if="${#fields.hasErrors('cidade')}" th:errors="*{cidade}"></p></div>
-                    <div class="campo"><label for="prof-bairro">Bairro</label><input id="prof-bairro" th:field="*{bairro}" maxlength="100"><p class="erro" th:if="${#fields.hasErrors('bairro')}" th:errors="*{bairro}"></p></div>
-                    <div class="campo campo-largo"><label for="prof-descricao">Descrição</label><textarea id="prof-descricao" th:field="*{descricao}" maxlength="1000" rows="3"></textarea><p class="erro" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></p></div>
+                    <div class="campo"><label for="prof-nome">Nome</label><input id="prof-nome" th:field="*{nome}" maxlength="120" th:attr="aria-invalid=${#fields.hasErrors('nome')},aria-describedby='prof-nome-erro'"><p class="erro" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" id="prof-nome-erro"></p></div>
+                    <div class="campo"><label for="prof-email">E-mail</label><input id="prof-email" type="email" th:field="*{email}" maxlength="160" th:attr="aria-invalid=${#fields.hasErrors('email')},aria-describedby='prof-email-erro'"><p class="erro" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" id="prof-email-erro"></p></div>
+                    <div class="campo"><label for="prof-telefone">Telefone</label><input id="prof-telefone" th:field="*{telefone}" maxlength="20" th:attr="aria-invalid=${#fields.hasErrors('telefone')},aria-describedby='prof-telefone-erro'"><p class="erro" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}" id="prof-telefone-erro"></p></div>
+                    <div class="campo"><label for="prof-senha">Senha inicial</label><input id="prof-senha" type="password" th:field="*{senha}" minlength="8" autocomplete="new-password" th:attr="aria-invalid=${#fields.hasErrors('senha')},aria-describedby='prof-senha-erro'"><p class="erro" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}" id="prof-senha-erro"></p></div>
+                    <div class="campo"><label for="prof-cidade">Cidade</label><input id="prof-cidade" th:field="*{cidade}" maxlength="100" th:attr="aria-invalid=${#fields.hasErrors('cidade')},aria-describedby='prof-cidade-erro'"><p class="erro" th:if="${#fields.hasErrors('cidade')}" th:errors="*{cidade}" id="prof-cidade-erro"></p></div>
+                    <div class="campo"><label for="prof-bairro">Bairro</label><input id="prof-bairro" th:field="*{bairro}" maxlength="100" th:attr="aria-invalid=${#fields.hasErrors('bairro')},aria-describedby='prof-bairro-erro'"><p class="erro" th:if="${#fields.hasErrors('bairro')}" th:errors="*{bairro}" id="prof-bairro-erro"></p></div>
+                    <div class="campo campo-largo"><label for="prof-descricao">Descrição</label><textarea id="prof-descricao" th:field="*{descricao}" maxlength="1000" rows="3" th:attr="aria-invalid=${#fields.hasErrors('descricao')},aria-describedby='prof-descricao-erro'"></textarea><p class="erro" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}" id="prof-descricao-erro"></p></div>
                     <fieldset class="campo campo-largo grupo-opcoes">
                         <legend>Serviços oferecidos</legend>
                         <label th:each="servico : ${servicos}"><input type="checkbox" th:field="*{servicoIds}" th:value="${servico.id}"><span th:text="${servico.nome}">Serviço</span></label>
@@ -63,11 +50,10 @@
 
         <section class="painel-etapa" aria-labelledby="titulo-etapa">
             <div class="painel-etapa-conteudo">
-                <p class="rotulo">Dados reais</p>
-                <h2 id="titulo-etapa">Profissionais no Precisei</h2>
+                <p class="rotulo">Escolha com confiança</p>
+                <h2 id="titulo-etapa">Encontre seu profissional</h2>
                 <p>
-                    Os perfis, serviços oferecidos e médias de avaliação são carregados
-                    diretamente do banco de dados.
+                    Compare serviços, disponibilidade e avaliações antes de enviar uma solicitação.
                 </p>
             </div>
             <a class="botao" th:href="@{/solicitacoes}" href="/solicitacoes">Consultar solicitações</a>
@@ -112,7 +98,7 @@
                         <li th:each="servico : ${profissional.servicos}"
                             th:text="${servico.nome}">Serviço</li>
                     </ul>
-                    <a class="link-editar" th:href="@{/profissionais/{id}/editar(id=${profissional.id})}">
+                    <a th:if="${@acessoService.profissionalProprio(profissional.id) or manutencao}" class="link-editar" th:href="@{/profissionais/{id}/editar(id=${profissional.id})}">
                         Editar perfil
                     </a>
                 </article>
@@ -124,9 +110,7 @@
         </section>
     </main>
 
-    <footer class="rodape-site">
-        <p>© 2026 Precisei - Projeto Integrador de Tecnologia da Informação II</p>
-    </footer>
+    <footer th:replace="~{fragments/navegacao :: rodape}"></footer>
 </body>
 
 </html>

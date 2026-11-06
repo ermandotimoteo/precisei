@@ -20,18 +20,27 @@ public class AvaliacaoService {
 
     private final AvaliacaoRepository avaliacaoRepository;
     private final SolicitacaoServicoRepository solicitacaoRepository;
+    private final com.precisei.security.AcessoService acesso;
 
     public AvaliacaoService(AvaliacaoRepository avaliacaoRepository,
-            SolicitacaoServicoRepository solicitacaoRepository) {
+            SolicitacaoServicoRepository solicitacaoRepository, com.precisei.security.AcessoService acesso) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.solicitacaoRepository = solicitacaoRepository;
+        this.acesso = acesso;
     }
 
     @Transactional
     public Avaliacao cadastrar(Long solicitacaoId, AvaliacaoForm form) {
-        SolicitacaoServico solicitacao = solicitacaoRepository.findById(solicitacaoId)
+        SolicitacaoServico solicitacao = solicitacaoRepository.buscarParaAtualizar(solicitacaoId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Solicitação não encontrada."));
+        acesso.exigirDono(com.precisei.security.TipoConta.CLIENTE, solicitacao.getCliente().getId());
+        if (acesso.usuario().tipo() != com.precisei.security.TipoConta.CLIENTE) {
+            throw new org.springframework.security.access.AccessDeniedException("A avaliação é exclusiva do cliente titular.");
+        }
+        if (form.getNota() < 1 || form.getNota() > 5 || (form.getComentario() != null && form.getComentario().length() > 1000)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Revise a nota e o comentário.");
+        }
         if (solicitacao.getStatus() != StatusSolicitacao.CONCLUIDA) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Somente solicitações concluídas podem ser avaliadas.");
@@ -40,7 +49,7 @@ public class AvaliacaoService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Esta solicitação já possui uma avaliação.");
         }
-        return avaliacaoRepository.save(new Avaliacao(
+        return avaliacaoRepository.saveAndFlush(new Avaliacao(
                 form.getNota(), form.getComentario(), solicitacao));
     }
 

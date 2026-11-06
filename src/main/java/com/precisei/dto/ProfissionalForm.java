@@ -26,6 +26,9 @@ public class ProfissionalForm {
     private String email;
 
     private String senha;
+    private String senhaAtual;
+    public String getSenhaAtual() { return senhaAtual; }
+    public void setSenhaAtual(String senhaAtual) { this.senhaAtual = senhaAtual; }
 
     @Size(max = 1000, message = "A descrição deve possuir no máximo 1000 caracteres.")
     private String descricao;

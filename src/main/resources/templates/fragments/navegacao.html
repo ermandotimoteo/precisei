@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="cabecalho(pagina)" class="cabecalho-site">
+    <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+    <nav aria-label="Navegação principal">
+        <a class="marca" th:href="@{/}" title="Página inicial"><span class="marca-icone" aria-hidden="true">P</span><h1>Precisei</h1></a>
+        <ul>
+            <li><a th:href="@{/}" th:attr="aria-current=${pagina == 'inicio' ? 'page' : null}">Início</a></li>
+            <li><a th:href="@{/profissionais}" th:attr="aria-current=${pagina == 'profissionais' ? 'page' : null}">Profissionais</a></li>
+            <li><a th:href="@{/servicos}" th:attr="aria-current=${pagina == 'servicos' ? 'page' : null}">Serviços</a></li>
+            <li th:if="${usuarioAtual != null and (usuarioAtual.tipo.name() == 'CLIENTE' or manutencao)}"><a th:href="@{/clientes}">Minha conta</a></li>
+            <li th:if="${usuarioAtual != null}"><a th:href="@{/solicitacoes}" th:attr="aria-current=${pagina == 'solicitacoes' ? 'page' : null}">Meus atendimentos</a></li>
+            <li th:if="${usuarioAtual == null}"><a th:href="@{/login}">Entrar</a></li>
+            <li th:if="${usuarioAtual == null}"><a th:href="@{/cadastro/cliente}">Cadastrar</a></li>
+            <li th:if="${usuarioAtual != null}"><form th:action="@{/logout}" method="post"><button class="sair" type="submit">Sair</button></form></li>
+        </ul>
+    </nav>
+</header>
+<footer th:fragment="rodape" class="rodape-site"><p>© 2026 Precisei · <a th:href="@{/privacidade}">Privacidade</a></p></footer>
+</body></html>

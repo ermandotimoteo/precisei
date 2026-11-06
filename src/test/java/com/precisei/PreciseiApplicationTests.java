@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.ActiveProfiles("test")
 class PreciseiApplicationTests {
 
     @Autowired
@@ -54,7 +55,8 @@ class PreciseiApplicationTests {
 
     @Test
     void deveRejeitarCadastroSemNome() throws Exception {
-        mockMvc.perform(post("/servicos").param("nome", ""))
+        mockMvc.perform(post("/servicos").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf())
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(new com.precisei.security.UsuarioAutenticado(0L, com.precisei.security.TipoConta.MANUTENCAO, "Manutenção"))).param("nome", ""))
                 .andExpect(status().isOk())
                 .andExpect(view().name("servicos"))
                 .andExpect(model().attributeHasFieldErrors("novaCategoria", "nome"));
@@ -62,7 +64,7 @@ class PreciseiApplicationTests {
 
     @Test
     void deveExibirPaginaDeClientes() throws Exception {
-        mockMvc.perform(get("/clientes"))
+        mockMvc.perform(get("/clientes").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(new com.precisei.security.UsuarioAutenticado(0L, com.precisei.security.TipoConta.MANUTENCAO, "Manutenção"))))
                 .andExpect(status().isOk())
                 .andExpect(view().name("clientes"))
                 .andExpect(model().attributeExists("clientes", "clienteForm"))
@@ -71,7 +73,7 @@ class PreciseiApplicationTests {
 
     @Test
     void deveExibirPaginaDeSolicitacoes() throws Exception {
-        mockMvc.perform(get("/solicitacoes"))
+        mockMvc.perform(get("/solicitacoes").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(new com.precisei.security.UsuarioAutenticado(0L, com.precisei.security.TipoConta.MANUTENCAO, "Manutenção"))))
                 .andExpect(status().isOk())
                 .andExpect(view().name("solicitacoes"))
                 .andExpect(model().attributeExists("solicitacoes", "solicitacaoForm"))

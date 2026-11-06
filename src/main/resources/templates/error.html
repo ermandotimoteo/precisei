@@ -1,0 +1,4 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Solicitação não concluída - Precisei</title><link rel="stylesheet" th:href="@{/css/style.css}"></head>
+<body><header th:replace="~{fragments/navegacao :: cabecalho('erro')}"></header><main id="conteudo" class="pagina-formulario"><section class="painel-formulario formulario-central"><h2>Não foi possível concluir</h2><p role="alert">Você pode não ter acesso a esta página ou os dados informados precisam ser revistos.</p><a class="botao" th:href="@{/}">Voltar ao início</a></section></main><footer th:replace="~{fragments/navegacao :: rodape}"></footer></body></html>

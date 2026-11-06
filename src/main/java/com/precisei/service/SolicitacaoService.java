@@ -24,19 +24,25 @@ public class SolicitacaoService {
     private final ClienteService clienteService;
     private final ProfissionalRepository profissionalRepository;
     private final ServicoRepository servicoRepository;
+    private final com.precisei.security.AcessoService acesso;
 
     public SolicitacaoService(SolicitacaoServicoRepository solicitacaoRepository,
             ClienteService clienteService, ProfissionalRepository profissionalRepository,
-            ServicoRepository servicoRepository) {
+            ServicoRepository servicoRepository, com.precisei.security.AcessoService acesso) {
         this.solicitacaoRepository = solicitacaoRepository;
         this.clienteService = clienteService;
         this.profissionalRepository = profissionalRepository;
         this.servicoRepository = servicoRepository;
+        this.acesso = acesso;
     }
 
     @Transactional(readOnly = true)
     public List<SolicitacaoServico> listarTodas() {
-        return solicitacaoRepository.findAllByOrderByDataSolicitacaoDesc();
+        if (acesso.manutencao()) return solicitacaoRepository.findAllByOrderByDataSolicitacaoDesc();
+        var user = acesso.usuario();
+        return user.tipo() == com.precisei.security.TipoConta.CLIENTE
+                ? solicitacaoRepository.findByClienteIdOrderByDataSolicitacaoDesc(user.id())
+                : solicitacaoRepository.findByProfissionalIdOrderByDataSolicitacaoDesc(user.id());
     }
 
     @Transactional(readOnly = true)
@@ -51,7 +57,7 @@ public class SolicitacaoService {
 
     @Transactional
     public SolicitacaoServico cadastrar(SolicitacaoForm form) {
-        Cliente cliente = clienteService.buscarPorId(form.getClienteId());
+        Cliente cliente = clienteService.buscarPorId(acesso.clienteAtual());
         Profissional profissional = buscarProfissional(form.getProfissionalId());
         Servico servico = servicoRepository.findById(form.getServicoId())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -61,6 +67,9 @@ public class SolicitacaoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "O profissional não está disponível para o serviço selecionado.");
         }
+        if (form.getDataAgendada() != null && form.getDataAgendada().isBefore(java.time.LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A data agendada não pode estar no passado.");
+        }
         SolicitacaoServico solicitacao = new SolicitacaoServico(form.getDataAgendada(),
                 form.getDescricao(), form.getObservacoes(), cliente, profissional, servico);
         return solicitacaoRepository.save(solicitacao);
@@ -68,11 +77,17 @@ public class SolicitacaoService {
 
     @Transactional
     public void alterarStatus(Long id, StatusSolicitacao novoStatus) {
-        SolicitacaoServico solicitacao = solicitacaoRepository.findById(id)
+        SolicitacaoServico solicitacao = solicitacaoRepository.buscarParaAtualizar(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Solicitação não encontrada."));
+        acesso.exigirPedido(solicitacao);
+        if (!acesso.proximosStatus(solicitacao).contains(novoStatus)) {
+            throw new org.springframework.security.access.AccessDeniedException("Seu perfil não pode realizar esta alteração.");
+        }
         try {
             solicitacao.alterarStatus(novoStatus);
+            org.slf4j.LoggerFactory.getLogger("security.audit").info("event=status_change requestId={} status={} actor={}",
+                    id, novoStatus, acesso.usuario().getUsername());
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
