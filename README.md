@@ -1,277 +1,121 @@
 # Precisei
 
-O **Precisei** é uma aplicação web acadêmica criada para organizar categorias de pequenos serviços domésticos e apoiar, em etapas futuras, a conexão entre moradores e profissionais autônomos.
+Aplicação web de serviços domésticos do Projeto Integrador de Tecnologia da Informação (UFMS Digital). A evolução de Projeto Integrador III transforma os planos de inspeção, testes, desenvolvimento seguro e CI/CD em código e automações verificáveis.
 
-O projeto faz parte do **Projeto Integrador de Tecnologia da Informação II**. O Módulo 2 entregou uma solução web dinâmica, responsiva e integrada ao MySQL. No Módulo 3, o projeto evolui a modelagem, a manipulação do banco de dados e o histórico de versionamento no Git.
+Java 17, Spring Boot 4.1.2, MVC/Thymeleaf, JPA, MySQL 8, Flyway, Spring Security e Actuator. As páginas são renderizadas no servidor: GitHub Pages não executa esta aplicação Java.
 
-## Objetivo
+## Funcionalidades e acesso
 
-Desenvolver uma aplicação web responsiva utilizando um framework moderno, HTML semântico, CSS e integração com banco de dados, mantendo uma estrutura simples e adequada ao contexto acadêmico.
+- Catálogo público, categorias (incluindo Faxina) e apresentação profissional.
+- Login por tipo de conta, sessão, logout, limite de tentativas e CSRF.
+- Cliente cria pedidos em seu nome, consulta seus atendimentos, cancela quando permitido e avalia conclusão própria.
+- Profissional edita seu perfil e aceita/inicia/conclui pedidos atribuídos a ele.
+- Manutenção gerencia catálogo; conta externa, sem senha padrão/autocadastro de privilégios.
+- Dados de clientes e contatos do atendimento restritos aos envolvidos/manutenção.
+- Formulários com validações, resumo de erros, campos associados a mensagens e layout responsivo.
+- Transações, restrições SQL e lock do pedido para avaliações/status concorrentes.
+- Novas senhas com Argon2id. BCrypt válido legado é verificado e atualizado gradualmente no login, sem converter senha não verificada.
 
-O público-alvo conceitual é formado por:
+Preços são referências, não orçamento confirmado. Pagamentos, chat, recuperação de senha e confirmação de mudança de e-mail não integram esta entrega.
 
-- moradores que necessitam de pequenos serviços ou reparos domésticos;
-- profissionais autônomos que desejam divulgar suas áreas de atuação.
+## Executar localmente no Windows
 
-## Tecnologias utilizadas
+Pré-requisitos: JDK 17 ou superior compatível, `JAVA_HOME` configurado e MySQL 8 iniciado. Maven Wrapper incluído.
 
-- Java 17;
-- Spring Boot 4.1.1;
-- Spring Web MVC;
-- Thymeleaf;
-- Spring Data JPA;
-- Hibernate;
-- Flyway para versionamento do esquema SQL;
-- Spring Validation;
-- MySQL 8;
-- HTML5;
-- CSS3;
-- Maven e Maven Wrapper;
-- JUnit, Mockito e MockMvc para testes.
-
-## Funcionalidades implementadas
-
-- página inicial responsiva;
-- navegação entre Início, Serviços, Profissionais, Clientes e Solicitações;
-- listagem dinâmica de categorias armazenadas no MySQL;
-- cadastro de categorias de serviço;
-- validação de nome obrigatório e tamanho máximo;
-- prevenção de categorias duplicadas;
-- mensagens de validação e confirmação no formulário;
-- carga inicial de categorias sem gerar duplicações;
-- ícones SVG específicos para as categorias;
-- página de profissionais integrada aos perfis reais do banco;
-- catálogo de serviços carregado do MySQL;
-- listagem de profissionais, localização, disponibilidade e serviços oferecidos;
-- mapeamento JPA de todas as entidades e relacionamentos do DER;
-- cadastro e edição de serviços com categoria e preço de referência;
-- cadastro e edição de profissionais com associação a vários serviços;
-- armazenamento de novas senhas profissionais com hash BCrypt;
-- cadastro e listagem de clientes, com validação de e-mail único e senha protegida por BCrypt;
-- criação de solicitações com cliente, profissional, serviço, descrição e agendamento opcional;
-- validação da disponibilidade do profissional e dos serviços que ele oferece;
-- listagem e acompanhamento das solicitações;
-- atualização controlada do status entre Pendente, Aceita, Em andamento, Concluída e Cancelada;
-- avaliação de solicitações concluídas com nota de 1 a 5 e comentário opcional;
-- bloqueio de avaliações duplicadas e cálculo da média de cada profissional;
-- testes unitários e de integração.
-
-Categorias iniciais:
-
-- Chaveiro;
-- Elétrica;
-- Faxina;
-- Hidráulica;
-- Montagem de móveis;
-- Pintura.
-
-## Escopo atual
-
-Esta versão representa uma **solução inicial dinâmica para o Módulo 2**, e não o MVP completo da plataforma.
-
-Ainda não foram implementados pela interface:
-
-- autenticação de usuários;
-- pesquisa de profissionais por localização e disponibilidade;
-- recuperação de senha e gerenciamento de sessão.
-
-Essas funcionalidades estão previstas para etapas futuras do projeto.
-
-## Arquitetura
-
-A aplicação segue uma arquitetura em camadas:
-
-```text
-Navegador
-    ↓
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-JPA / Hibernate
-    ↓
-MySQL
-```
-
-As páginas são renderizadas pelo Thymeleaf:
-
-```text
-Controller → Model → Thymeleaf → HTML → CSS
-```
-
-## Modelagem de dados — Módulo 3
-
-A evolução planejada do banco está documentada em:
-
-- [Modelo de dados e DER](docs/modelagem/der.md);
-- [Dicionário de dados](docs/modelagem/dicionario-de-dados.md);
-- [Regras de integridade e negócio](docs/modelagem/regras-de-integridade.md).
-
-O modelo inclui Categoria, Serviço, Profissional, Cliente, Solicitação de Serviço e Avaliação, além da associação muitos para muitos entre profissionais e serviços. O esquema correspondente está implementado em migrações Flyway e todas as tabelas estão mapeadas em entidades JPA.
-
-### Esquema SQL versionado
-
-A migração inicial está em [`V1__criar_esquema_inicial.sql`](src/main/resources/db/migration/V1__criar_esquema_inicial.sql). Ela:
-
-- preserva as categorias cadastradas no Módulo 2;
-- padroniza a chave primária como `id_categoria`;
-- cria as tabelas, chaves estrangeiras e restrições do DER;
-- cria índices para as consultas planejadas;
-- é registrada automaticamente na tabela `flyway_schema_history`.
-
-O Hibernate está configurado com `ddl-auto=validate`: ele verifica o mapeamento das entidades, mas não altera o banco silenciosamente. As mudanças estruturais passam a ser responsabilidade das migrações SQL versionadas.
-
-A migração [`V2__inserir_dados_demonstracao.sql`](src/main/resources/db/migration/V2__inserir_dados_demonstracao.sql) fornece dados relacionados para testar o modelo. As operações exigidas no Módulo 3 estão disponíveis em:
-
-- [`01_consultas.sql`](docs/sql/01_consultas.sql): consultas simples, relacionais, agregações e filtros;
-- [`02_atualizacoes.sql`](docs/sql/02_atualizacoes.sql): atualizações demonstradas dentro de uma transação reversível;
-- [`03_remocoes.sql`](docs/sql/03_remocoes.sql): remoções seguras de registros temporários;
-- [`04_testes_integridade.sql`](docs/sql/04_testes_integridade.sql): tentativas inválidas para comprovar restrições;
-- [evidências da execução](docs/banco/evidencias-crud.md): resultados observados no MySQL.
-- [auditoria dos requisitos do Módulo 3](docs/auditoria-modulo-3.md): correspondência entre requisitos, implementação e evidências.
-
-## Estrutura principal
-
-```text
-src/
-├── main/
-│   ├── java/com/precisei/
-│   │   ├── config/       # Carga dos dados iniciais
-│   │   ├── controller/   # Rotas e requisições HTTP
-│   │   ├── model/        # Entidades persistentes
-│   │   ├── repository/   # Acesso ao banco de dados
-│   │   └── service/      # Regras de negócio
-│   └── resources/
-│       ├── static/css/   # Estilização responsiva
-│       ├── templates/    # Páginas e fragmentos Thymeleaf
-│       ├── db/migration/ # Migrações SQL executadas pelo Flyway
-│       └── application.properties
-└── test/java/com/precisei/ # Testes unitários e de integração
-```
-
-## Pré-requisitos
-
-Antes de executar o projeto, instale:
-
-- Java Development Kit (JDK) 17 ou superior compatível;
-- MySQL Community Server 8;
-- Git, somente para clonagem e controle de versão.
-
-Não é necessário instalar o Maven separadamente, pois o projeto contém o Maven Wrapper.
-
-## Configuração do banco de dados
-
-1. Inicie o servidor MySQL.
-
-2. Crie apenas o banco de dados vazio:
-
-```sql
-CREATE DATABASE precisei
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-```
-
-Não crie as tabelas manualmente. Ao iniciar a aplicação, o Flyway executará as migrações pendentes. Se você já utilizava o banco da versão anterior, a primeira migração preservará as categorias existentes e criará o restante do esquema.
-
-3. Configure a senha do MySQL por variável de ambiente.
-
-No PowerShell:
+Crie um banco de desenvolvimento vazio ou preserve o banco `precisei` existente. V1/V2 históricas não foram alteradas. No PowerShell da pasta:
 
 ```powershell
-$env:DB_PASSWORD = "SUA_SENHA_LOCAL"
-```
-
-Se o usuário do MySQL não for `root`, configure também:
-
-```powershell
-$env:DB_USERNAME = "SEU_USUARIO"
-```
-
-Se a URL do banco for diferente da configuração padrão, utilize:
-
-```powershell
-$env:DB_URL = "jdbc:mysql://localhost:3306/precisei"
-```
-
-As variáveis definidas dessa forma permanecem disponíveis somente na janela atual do PowerShell. Isso evita armazenar credenciais reais no código-fonte.
-
-## Como executar no Windows
-
-Abra o PowerShell na pasta do projeto, configure as variáveis necessárias e execute:
-
-```powershell
+$env:DB_URL = 'jdbc:mysql://localhost:3306/precisei'
+$env:DB_USERNAME = 'SEU_USUARIO_LOCAL'
+$env:DB_PASSWORD = 'SUA_SENHA_LOCAL'
 .\mvnw.cmd spring-boot:run
 ```
 
-Quando o terminal informar que a aplicação foi iniciada, acesse:
+Acesse `http://localhost:8080`. Cliente se cadastra em `/cadastro/cliente`; profissional em `/profissionais`. Entre em `/login` selecionando o tipo de conta. Mantenha o processo aberto durante o uso; `Ctrl+C` encerra o servidor.
 
-```text
-http://localhost:8080
-```
+Arquivos `.env` **não são carregados automaticamente pelo Spring**. São referência e configuração para Compose; não versione cópias preenchidas.
 
-Mantenha o PowerShell aberto enquanto estiver utilizando a aplicação. Ao encerrar o processo ou fechar a janela, o servidor local será desligado.
+### Manutenção
 
-Para interromper a execução, pressione `Ctrl + C`.
+Gere hash em terminal interativo com `.\scripts\hash-password.ps1`; defina `ADMIN_EMAIL` e `ADMIN_PASSWORD_HASH` como variáveis protegidas e reinicie a aplicação. Não existe senha administrativa embutida. O utilitário não aceita a senha por argumento.
 
-## Rotas disponíveis
+Registros `.demo@precisei.local` da V2 são fixtures históricas, **não credenciais utilizáveis**. Cadastre sua própria conta. Produção recusa essas contas demonstrativas sem apagá-las automaticamente.
 
-| Método | Rota | Descrição |
-|---|---|---|
-| GET | `/` | Exibe a página inicial e as categorias |
-| GET | `/servicos` | Lista categorias e apresenta o formulário |
-| POST | `/servicos` | Valida e cadastra uma categoria |
-| POST | `/servicos/novo` | Valida e cadastra um serviço |
-| GET | `/servicos/{id}/editar` | Exibe o formulário de edição do serviço |
-| POST | `/servicos/{id}/editar` | Atualiza um serviço |
-| GET | `/profissionais` | Lista profissionais e apresenta o formulário de cadastro |
-| POST | `/profissionais/novo` | Valida e cadastra um profissional |
-| GET | `/profissionais/{id}/editar` | Exibe o formulário de edição do profissional |
-| POST | `/profissionais/{id}/editar` | Atualiza um profissional |
-| GET | `/clientes` | Lista clientes e apresenta o formulário de cadastro |
-| POST | `/clientes/novo` | Valida e cadastra um cliente |
-| GET | `/solicitacoes` | Lista solicitações e apresenta o formulário de criação |
-| POST | `/solicitacoes/novo` | Valida e cria uma solicitação |
-| POST | `/solicitacoes/{id}/status` | Atualiza o status conforme as transições permitidas |
-| POST | `/solicitacoes/{id}/avaliacao` | Avalia uma solicitação concluída |
-
-## Como executar os testes
-
-Com o MySQL iniciado e a variável `DB_PASSWORD` configurada, execute:
+## Testes
 
 ```powershell
-.\mvnw.cmd test
+.\mvnw.cmd verify
 ```
 
-Na última validação foram executados **37 testes**, sem falhas ou erros.
+Os testes Spring ativam `test` e, por padrão, usam MySQL descartável via Testcontainers (exige Docker Linux disponível). Sem Docker, crie **dois bancos exclusivos vazios**, contendo `_test` no nome, e configure:
 
-## Responsividade e acessibilidade
+```powershell
+$env:TEST_DB_URL = 'jdbc:mysql://localhost:3306/precisei_test'
+$env:TEST_PROD_DB_URL = 'jdbc:mysql://localhost:3306/precisei_production_test'
+$env:TEST_DB_USERNAME = 'USUARIO_DE_TESTE'
+$env:TEST_DB_PASSWORD = 'SENHA_DE_TESTE'
+$env:TEST_DB_DRIVER = 'com.mysql.cj.jdbc.Driver'
+.\mvnw.cmd verify
+```
 
-A interface utiliza HTML semântico, incluindo `header`, `nav`, `main`, `section`, `article`, `form`, `label`, `button` e `footer`.
+A conta pode criar/alterar tabelas nesses bancos, nunca na base real. Bootstrap operacional é testado separadamente sem contas/pedidos de demonstração. Relatórios: `target/surefire-reports`, `target/site/jacoco/index.html` e SBOM em `target/classes/META-INF/sbom/`.
 
-Também foram aplicados:
+### Navegador e acessibilidade
 
-- idioma da página definido como português do Brasil;
-- rótulos associados aos campos do formulário;
-- indicação da página atual na navegação;
-- mensagens de erro associadas ao campo inválido;
-- foco visível para links, campos e botões;
-- SVGs decorativos ocultos das tecnologias assistivas;
-- Grid, Flexbox e media queries para adaptação da interface.
+Node.js 24 e pnpm 11.25.0. Inicie a aplicação em base **sintética de teste** com catálogo disponível:
 
-## Próximas etapas
+```powershell
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium firefox
+pnpm check
+$env:BASE_URL = 'http://127.0.0.1:8080'
+pnpm test:e2e
+```
 
-- permitir filtros por categoria, localização e disponibilidade;
-- adicionar autenticação em uma etapa posterior;
-- criar recuperação de senha e gerenciamento de sessão.
+O E2E cria contas/pedidos sintéticos: não apontar para produção. Chromium em três tamanhos, Firefox e axe-core complementam leitor de tela e aceite humano. Para incluir Edge instalado no Windows, defina `$env:EDGE_TEST = '1'`. Evidências em `playwright-report/` e `test-results/` são ignoradas no Git.
 
-## Contexto acadêmico
+### Operação, mutação e carga
 
-Projeto desenvolvido para o **Projeto Integrador de Tecnologia da Informação II**. O Módulo 2 abordou desenvolvimento web com frameworks e HTML/CSS; o Módulo 3 aborda modelagem, manipulação de banco de dados e controle de versão.
+```powershell
+python -m unittest discover -s tests/ops -v
+.\mvnw.cmd -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage
+.\scripts\hash-password.ps1 --benchmark
+```
 
-Local de referência do projeto: João Pessoa - PB, Brasil.
+`tests/load/catalogo.js` contém o piloto k6 com 1/5/10 usuários. Limiares p95 < 2s e erros < 1% são provisórios; preparar dataset e medir sem outras cargas concorrentes. Os 37 testes dos relatórios antigos são históricos; consultar [evidências atuais](docs/qualidade/implementacao.md).
 
-## Autor
+`tests/database/constraints.py --database precisei_test` retesta dez restrições no MySQL com fixtures e rollback; use `MYSQL_PWD`/`MYSQL_USER`/`MYSQL_HOST` externos e opcional `--mysql` para o caminho do executável. Recusa a base operacional.
+`scripts/seed-load.py --database precisei_load_test` prepara 100 profissionais/1.000 pedidos em uma base **já migrada e exclusiva**; contas sintéticas não permitem login. O workflow manual **Piloto de carga** prepara seu próprio banco e executa três repetições completas. `LOAD_SMOKE=1` seleciona somente a carga curta de cinco usuários/30 s.
 
-**Nome:** Ermando Timotio de Sousa Filho.
+`scripts/exercise-recovery.py` permite ensaio local cifrado com MySQL/age, exige origem de teste e destino novo `_restore_test`, compara contagens e não sobrescreve bases. Informe `--source`/`--destination` e, se necessário, caminhos das ferramentas com `--mysql`, `--mysqldump`, `--age` e `--age-keygen`. O exercício não substitui o restore operacional em homologação.
+
+## Migrações e produção
+
+- Base histórica: `db/migration` (V1/V2 originais) + `db/common` (V3+).
+- Base operacional **nova**: `db/production` (V1 esquema e V2 categorias sem contas/pedidos) + `db/common`.
+- Nunca trocar a linha de origem de um banco já migrado. Futuras mudanças são comuns em V3+; não executar `repair`/`baseline` para ocultar incompatibilidade.
+- V3 cria índices de consultas por participante/data. Hibernate apenas valida o esquema.
+- Perfil `prod` não executa Flyway; job `migrate` usa conta de DDL separada, sem servidor web. Conta da aplicação não tem DDL/administração.
+
+Veja [implantação e recuperação](docs/operacao/implantacao.md).
+
+## CI/CD e limites de ativação
+
+`CI`: validação, MySQL/testes, cobertura/SBOM, imagem, scanners e E2E. Publicação em push confiável promove a **imagem testada** sem reconstruí-la.
+`CD`: valida procedência, manifesto e digest; homologação automática e produção por disparo/aprovação protegida. Produção recusa ambiente sem aprovador obrigatório. Actions por SHA, token mínimo e SSH de comando restrito.
+Qualidade periódica inclui mutação; Dependabot propõe atualizações. Backup criptografado, restore em base nova e monitoramento possuem scripts próprios.
+
+Workflows só serão ativados no GitHub quando publicados. Segredos, revisores, servidor, DNS/TLS, registro e notificações exigem configuração real pelo responsável. Esta implementação não publica/implanta automaticamente o projeto.
+
+## Documentação
+
+- [Matriz de implementação e verificações](docs/qualidade/implementacao.md)
+- [Modelo de ameaças](docs/seguranca/modelo-de-ameacas.md)
+- [Governança, incidentes e IA](docs/seguranca/governanca.md)
+- [Aceite com o público](docs/qualidade/aceitacao-publico.md)
+- [Operação e implantação](docs/operacao/implantacao.md)
+- [DER](docs/modelagem/der.md), [dicionário](docs/modelagem/dicionario-de-dados.md) e [regras](docs/modelagem/regras-de-integridade.md)
+
+Os PDFs de `output/pdf/` preservam o planejamento acadêmico de suas datas. A matriz distingue implementação, comprovação e dependências humanas/operacionais.
+
+Autor: **Ermando Timotio de Sousa Filho**. Referência: moradores e profissionais autônomos de João Pessoa - PB.

@@ -46,6 +46,12 @@ As regras abaixo orientam o esquema SQL e as validações no Spring. Elas separa
 - mudanças de status respeitam o fluxo permitido;
 - mensagens de validação são apresentadas de forma compreensível na interface.
 
+### Evolução de segurança e concorrência (06/11/2026)
+
+O cliente do pedido é obtido da sessão autenticada. Só o cliente titular pode avaliar a conclusão e cancelar quando permitido; só o profissional atribuído ou a manutenção podem avançar o atendimento. As consultas privadas filtram o participante e cada alteração repete a verificação no serviço. Duas gravações disputadas são serializadas por lock do pedido, além da restrição UNIQUE da avaliação.
+
+Novas senhas usam Argon2id; BCrypt legado válido é atualizado após login verificado. Hash não substitui controle de acesso. Consulte a [matriz de implementação e evidências](../qualidade/implementacao.md) para os resultados atuais e limites dos testes.
+
 ## Fluxo implementado de status
 
 ```mermaid

@@ -51,4 +51,4 @@ Histórico principal do módulo:
 
 A suíte automatizada possui 37 testes aprovados, incluindo regras de negócio, controllers, inicialização do contexto, integração com MySQL e renderização das páginas principais. As telas também foram verificadas no navegador.
 
-Todos os requisitos técnicos informados para o Módulo 3 estão atendidos. Como fechamento da entrega, resta apenas produzir o relatório acadêmico no modelo solicitado, caso ele seja exigido nesta etapa, e decidir quando integrar a branch `modulo-3` à branch principal.
+Todos os requisitos técnicos informados para o Módulo 3 de Projeto Integrador II foram atendidos e o relatório acadêmico dessa etapa já foi produzido. Este arquivo preserva a auditoria histórica de setembro. A evolução de qualidade e segurança em Projeto Integrador III é registrada em `docs/qualidade/implementacao.md`; seus resultados não devem ser confundidos com a suíte histórica de 37 testes. A integração/publicação da nova branch depende de revisão própria.
